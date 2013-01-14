@@ -1,0 +1,22 @@
+@CHARSET "UTF-8";
+.box_move {
+  cursor: move;	
+}
+
+.box_grab {
+  cursor: move;	
+}
+
+.box_resize_corner {
+  cursor: se-resize;	
+}
+
+.box_resize_bottom {
+  cursor: s-resize;	
+}
+
+.box_resize_right {
+  cursor: e-resize;	
+}
+
+

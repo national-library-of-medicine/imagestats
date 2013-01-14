@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataConfig>
+  <dataSource type="JdbcDataSource" name="ds-1" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://lhce-pl-db/pl?zeroDateTimeBehavior=round" 
+batchSize="-1" user="pluser" password="pluserpassword"/>
+    <document>
+	<entity dataSource="ds-1" name="image_search" pk="image_id"
+            query="select * from image_search"
+            deltaImportQuery="select * from image_search where image_id='${dataimporter.delta.image_id}'"
+            deltaQuery="select image_id from image_search where DATE_ADD(record_updated, INTERVAL 10 SECOND) > '${dataimporter.last_index_time}'
+                        OR DATE_ADD(created, INTERVAL 10 SECOND) > '${dataimporter.last_index_time}'">
+        </entity>
+    </document>
+</dataConfig>

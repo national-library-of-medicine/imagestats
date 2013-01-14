@@ -1,0 +1,36 @@
+@CHARSET "UTF-8";
+
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777777;
+  margin: 40px 0px 70px;
+  text-align: center;
+}
+
+
+.homeBanner {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777777;
+  margin: 0px auto;
+  text-align: center;
+}
+
+.searchBox {
+  margin: 10px auto;
+  text-align: center;	
+}
+
+.eventListBox {
+	margin-right: 5px;
+}
+
+.loginUserText {
+  font-size: 1em;
+  /*font-weight: normal;*/
+  color: blue;
+  margin: 0px auto;
+  text-align: right;
+}
+

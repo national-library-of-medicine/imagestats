@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>ImageStats Help</title>
+</head>
+<body>
+<table><tbody valign="bottom"><tr>
+<td id="header" align="left">
+  <a href="https://pl.nlm.nih.gov/">
+    <img id="leftHeaderLogoImg" src="https://pl.nlm.nih.gov/theme/lpf3/img/pl.png" alt="People Locator Logo" />
+  </a>
+</td>
+<td id="headerText" style="text-align: left">
+			<span class="{style.homeBanner}">ImageStats</span><br/>
+			<span>U.S. National Library of Medicine</span><br/>
+			<span>Lister Hill National Center for Biomedical Communications</span>
+</td>
+<td align="right" valign="top">
+  <a href="http://www.nlm.nih.gov/">
+    <img src="https://pl.nlm.nih.gov/theme/lpf3/img/NLMlogoSmall.gif" alt="United States National Library of Medicine Logo" />
+  </a>
+</td>
+</tr>
+</tbody></table>
+<hr/>
+<h2><a name="annotations" id="annotations">Annotating Images</a></h2>
+<p>
+On the 'PL Results' panel, double click desired image to get 
+the pop up dialog box to create annotations on the image.
+</p> 
+<h3>Creating Annotations</h3>
+<p>
+Annotations are represented by marking rectangular areas of the image 
+for a specific feature. Each rectangle is color coded to represent a 
+type of a feature. The following features are supported.
+</p>
+
+<ul>
+<li>Face: Represented with <span style="background: yellow">yellow</span>.</li>
+<li>Profile: Represented with <span style="background: red">red</span>.</li>
+<li>Skin: Represented with <span style="background: cyan">cyan</span>.</li>
+</ul>
+<p>
+The following tasks can be performed to create the annotations
+</p>
+<h4>Creating a new box</h4>
+<p>
+First select a desired feature by using the radio buttons at the top of 
+the dialog box.
+
+Using your mouse left button, hold it down to start at the upper left 
+corner of the rectangle, drag the mouse to desired lower right corner 
+of the rectangle, and release the button. (Do not worry about precise 
+size and location of the box. You can always move and resize the box 
+to desired area). 
+Sometimes the size of the box is not locked. In that case, just click 
+inside the box, to end the sizing. Then you should be able to move and 
+resize the box to your desired place.
+</p>
+<h4>Select a box</h4>
+<p>
+Simply click on a box to highlight and bring it to the top of the 
+canvas. Highlighting is indicated with thicker edges of the box.
+</p>
+<h4>Moving a box</h4>
+<p>
+First select a desired box and simply drag the box around using mouse 
+left button.
+</p>
+
+<h4>Resizing a box</h4>
+<p>
+Select a desired box. There are three ways you can resize it.
+</p> 
+<ol>
+<li>Drag the bottom right corner to the desired size. This moves bottom 
+right corner around the canvas.</li>
+<li>You can drag right edge to desired size.</li>
+<li>You can drag bottom edge to the desired size.</li>
+</ol> 
+<h4>Deleting a box</h4>
+<p>
+Select the desired box. Hold down your Ctrl+Alt buttons on the keyboard 
+and click on the box.
+</p>
+<h3>Saving annotations</h3>
+<p>
+Use 'Save Initial' or 'Save Final' buttons at the top to store all 
+annotations on the canvas to the database for later retrieval. 
+The annotations created on the canvas can be stored in database as 
+initial annotations or final annotations. At this point, initial and 
+final notion is used simply to support annotations by two persons. 
+There are no software imposed rules on who should or should not act 
+as initial or final.
+</p>
+<h3>Restoring Annotations from FaceFinder or/and Database</h3>
+<p>
+Clicking of restore buttons simply adds additional boxes
+from those sources to the canvas. One way to use them, would be to create and save the 
+boxes incrementally. For example create skin annotations, and save them. Clear the 
+canvas and create faces. Now you can retrieve the saved skin boxes and store both skin and 
+faces combined.
+</p>
+<h3><a name="exportAnnotations" id="exportAnnotations">Exporting annotations</a></h3>
+<p>
+On the PL Results panel:
+</p>
+ 
+<ol>
+<li>
+Go to PL Results panel (close the annotation dialog box if open).
+</li>
+<li>
+From the export format pulldown menu, choose 
+'Initial GroundTruthData to TSV file' or 'Final GroundTruthData to TSV file'.
+</li>
+<li>
+Choose desired export button to export to a tab delimited text file 
+(choices: Export Selected, Export all on the page, Export all results).
+</li>
+</ol>
+<p>
+
+</p>
+</body>
+</html>
