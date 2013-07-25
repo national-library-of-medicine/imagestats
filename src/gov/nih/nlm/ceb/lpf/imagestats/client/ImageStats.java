@@ -6,6 +6,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import gov.nih.nlm.ceb.lpf.imagestats.client.PLLoadResultListStoreBinding;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ClientUtils;
@@ -213,7 +217,9 @@ public class ImageStats implements IsWidget, EntryPoint {
       		PLSolrParams solrParams = thisRef.buildSOLRParams();
       		solrParams.add("start", String.valueOf(loadConfig.getOffset()));
       		solrParams.add("rows", String.valueOf(loadConfig.getLimit()));
-      		String source = sourceMap.get(sourceListBox.getValue().getValue());
+      		//String source = sourceMap.get(sourceListBox.getValue().getValue());
+      		String source="";
+    	    
       	  imageStatsService.searchSOLRForPaging(source, solrParams, callback);
       	}
       	catch (IOException ioe) {
@@ -284,7 +290,7 @@ public class ImageStats implements IsWidget, EntryPoint {
     VerticalLayoutContainer vcon = new VerticalLayoutContainer();
     BorderLayoutData northData = new BorderLayoutData(100);
     northData.setMargins(new Margins(25));
-    createBanner(); 
+    //createBanner(); 
     mainPanel.setNorthWidget(banner, northData);
 
     BorderLayoutData westData = new BorderLayoutData(260);
@@ -321,7 +327,9 @@ public class ImageStats implements IsWidget, EntryPoint {
     HorizontalPanel searchlayout = new HorizontalPanel();
     
 		try {
-  		String source = sourceMap.get(sourceListBox.getValue().getValue());
+  		//String source = sourceMap.get(sourceListBox.getValue().getValue());
+			String source = "";
+
 			PLSolrParams solrParams = ClientUtils.buildDefaultSOLRParams();
 			solrParams.add("q", "*:*");
 			imageStatsService
@@ -338,6 +346,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 						}
 
 						public void onSuccess(Map<String, List<FacetModel>> eventList) {
+							if(eventList!=null){
 							Iterator<String> iter = eventList.keySet().iterator();
 							while (iter.hasNext()) {
 								String field = iter.next();
@@ -346,7 +355,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 								parent.setField(field);
 								facetStore.add(parent);
 								facetStore.add(parent, eventList.get(field));
-							}
+							}}
 							facetTree.expandAll();
 						}
 					});
@@ -385,7 +394,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 		return searchlayout;
 	}
 
-	PLSolrParams buildFacetFilters(List<FacetModel> selected) {
+/*	PLSolrParams buildFacetFilters(List<FacetModel> selected) {
 		PLSolrParams ret = new PLSolrParams();
 		Iterator<FacetModel> root_iter = facetTree.getStore().getRootItems().iterator();
 
@@ -416,8 +425,21 @@ public class ImageStats implements IsWidget, EntryPoint {
 		  }
 		}
 		return ret;
-	}
+	}*/
 	
+	PLSolrParams buildFacetFilters(List<FacetModel> selected) {
+		PLSolrParams ret = new PLSolrParams();
+		//Iterator<FacetModel> root_iter = facetTree.getStore().getRootItems().iterator();
+
+		Iterator<FacetModel> iter = selected.iterator();
+		
+		  while(iter.hasNext()) {
+			  FacetModel param = iter.next();
+			  ret.add(param.getParent(), param.getField());
+		  }
+		
+		return ret;
+	}
 
 	PLSolrParams buildFacetFilters() {
 		List<FacetModel> selected = facetTree.getCheckedSelection();
@@ -428,10 +450,21 @@ public class ImageStats implements IsWidget, EntryPoint {
 	PLSolrParams buildSOLRParams() {
 		PLSolrParams ret = ClientUtils.buildDefaultSOLRParams();
 		ret.addAll(buildFacetFilters());
-		String str = searchBox.getText();
+		Iterator<FacetModel> root_iter = facetTree.getStore().getRootItems().iterator();
+		while(root_iter.hasNext()) {
+			FacetModel rootFacet = root_iter.next();
+			Set<String> facets = ret.get(rootFacet.getField());
+			if(facets!=null && facets.size()>1){
+				facets.remove("disable");
+			}
+			ret.remove(rootFacet.getField());
+			if(facets!=null)
+				ret.add(rootFacet.getField(), facets);
+		}
+		/*String str = searchBox.getText();
     if(str != null && str.trim().length() > 0) {
 			ret.add("q", str);
-		}
+		}*/
 		return ret;
 	}
 	

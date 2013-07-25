@@ -17,7 +17,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.googlecode.javacv.cpp.opencv_core.IplImage;
+
+//import com.googlecode.javacv.cpp.opencv_core.IplImage;
 
 public class Utils {
 	public static String solrDateFormat = "yyyy-MM-dd'T'hh:mm:ss'Z'";
@@ -42,7 +43,7 @@ public class Utils {
     ret = al.toArray(new String[0]);
     return ret;
 	}
-	
+	/*
 	public static String getColorModel(IplImage iplImage) {
 		StringBuffer sb  = new StringBuffer();
 		for(int i = 0; iplImage != null && i < 4; i++) {
@@ -50,7 +51,7 @@ public class Utils {
 		}
 		return sb.toString().trim();
 	}
-
+*/
 	
 	static public ImageRegionModel[] parseToRegionModels(String regionsSpec) {
     ImageRegionModel[] ret = new ImageRegionModel[0];
