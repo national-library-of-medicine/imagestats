@@ -85,31 +85,45 @@ public class ClientUtils {
 
 	public static PLSolrParams buildDefaultSOLRParams() {
 		PLSolrParams ret = new PLSolrParams();
-
-    //ret.add("q", "*:*");
-    ret.add("fq", "url_thumb:[* TO *]");
-    ret.add("qt", "edismax");
-		ret.add("facet", "on");
+		
+	//Commented initially
+		//ret.add("q", "*:*");
+	//Filter Query(Solr specific) 
+		//ret.add("fq", "url_thumb:[* TO *]");
+    //Define Query Type(Solr Specific)
+    	//ret.add("qt", "edismax");
+	//Faceting on(Not necessary)
+		//ret.add("facet", "on");
+	//Was commented initially
 		//ret.add("facet.mincount", "1");
+	//Sort according
 		ret.add("facet.sort", "index");
+	//Fields for faceting
 		ret.add("facet.field", ISConstants.FIELD_EVENT_NAME);
 		ret.add("facet.field", ISConstants.FIELD_GROUNDTRUTH_STATUS);
-		ret.add("facet.field", ISConstants.FIELD_COLOR_CHANNELS);
+		//ret.add("facet.field", ISConstants.FIELD_COLOR_CHANNELS);
 		ret.add("facet.query", ISConstants.JPEG_TYPE_QUERY_STR);
 		ret.add("facet.query", ISConstants.GIF_TYPE_QUERY_STR);
 		ret.add("facet.query", ISConstants.PNG_TYPE_QUERY_STR);
-		ret.add("facet.range", ISConstants.FIELD_IMAGE_WIDTH);
-		ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.start", "0");
-		ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.end", "2000");
-		ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.gap", "400");
-		ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.other", "after");
-		ret.add("facet.range", ISConstants.FIELD_IMAGE_HEIGHT);
-		ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.start", "0");
-		ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.end", "2000");
-		ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.gap", "400");
-		ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.other", "after");
+		ret.add(ISConstants.FIELD_EVENT_NAME, "disable");
+		ret.add(ISConstants.IMAGE_TYPE, "disable");
+		ret.add(ISConstants.FIELD_GROUNDTRUTH_STATUS, "disable");
+	//Image Height and Width ranges (Fields not there)
+		//ret.add("facet.range", ISConstants.FIELD_IMAGE_WIDTH);
+		//ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.start", "0");
+		//ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.end", "2000");
+		//ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.gap", "400");
+		//ret.add("f."+ISConstants.FIELD_IMAGE_WIDTH+".facet.range.other", "after");
+		//ret.add("facet.range", ISConstants.FIELD_IMAGE_HEIGHT);
+		//ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.start", "0");
+		//ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.end", "2000");
+		//ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.gap", "400");
+		//ret.add("f."+ISConstants.FIELD_IMAGE_HEIGHT+".facet.range.other", "after");
+	//Was commented initially
 		//ret.add("rows", "0");
-		ret.add("wt", "json");
+	//Response format type Json (Not valid)
+		//ret.add("wt", "json");
+	//Sort accordng to Created
 		ret.add("sort", "created desc");
 		
     return ret;	

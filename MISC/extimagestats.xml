@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='utf-8'?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -16,7 +15,7 @@
   limitations under the License.
 -->
 <!-- The contents of this file will be loaded for each web application -->
-<Context>
+<Context docBase="E:/gsoc/workspace/imagestats/war">
 
     <!-- Default set of monitored resources -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
@@ -59,7 +58,7 @@
     username="" 
     password="" 
     driverClassName="org.sqlite.JDBC"
-    url="jdbc:sqlite:/C:/apache-tomcat-7.0.41/webapps/imagestats/PLDB.db"/>
+    url="jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/PLDB.db"/>
 <!--
   <Resource 
     name="jdbc/users" 
@@ -96,4 +95,5 @@
   
    <Environment name="/repository/virtual" value="/repo"
          type="java.lang.String" />  
+  
 </Context>

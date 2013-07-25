@@ -2,7 +2,7 @@
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "
 http://jetty.mortbay.org/configure.dtd">
 <Configure class="org.mortbay.jetty.webapp.WebAppContext">
-  <New id="MSSQLDS" class="org.mortbay.jetty.plus.naming.Resource">
+  <!--<New id="MSSQLDS" class="org.mortbay.jetty.plus.naming.Resource">
     <Arg></Arg>
     <Arg>java:/comp/env/jdbc/pl</Arg>
     <Arg>
@@ -12,9 +12,22 @@ http://jetty.mortbay.org/configure.dtd">
         <Set name="Password"></Set>
       </New>
     </Arg>
+  </New>-->
+
+  <New id="SQLiteDS" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg></Arg>
+    <Arg>java:/comp/env/jdbc/pl</Arg>
+    <Arg>
+      <New class="org.apache.commons.dbcp.BasicDataSource">
+        <Set name="driverClassName">org.sqlite.JDBC</Set>
+        <Set name="Url">jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/PLDB.db</Set>
+        <Set name="Username"></Set>
+        <Set name="Password"></Set>
+      </New>
+    </Arg>
   </New>
 
-  <New id="MSSQLDS1" class="org.mortbay.jetty.plus.naming.Resource">
+  <!--<New id="MSSQLDS1" class="org.mortbay.jetty.plus.naming.Resource">
     <Arg></Arg>
     <Arg>java:/comp/env/jdbc/users</Arg>
     <Arg>
@@ -24,12 +37,26 @@ http://jetty.mortbay.org/configure.dtd">
         <Set name="Password"></Set>
       </New>
     </Arg>
-  </New>
+  </New>-->
 
+  <!--<New id="SQLiteDS1" class="org.mortbay.jetty.plus.naming.Resource">
+    <Arg></Arg>
+    <Arg>java:/comp/env/jdbc/users</Arg>
+    <Arg>
+      <New class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+        <Set name="Url">jdbc:mysql://lhce-pl-db.nlm.nih.gov:3306/tomcat_users?autoReconnect=true</Set>
+        <Set name="User"></Set>
+        <Set name="Password"></Set>
+      </New>
+    </Arg>
+  </New>-->
+<!--
   <New id="MyEnvEntry1" class="org.mortbay.jetty.plus.naming.EnvEntry">
     <Arg>java:/comp/env/defaultSolrUrl</Arg>
     <Arg type="java.lang.String">http://lhce-pl-web01.nlm.nih.gov:8983/solr/imagestats/select</Arg>
+    <Arg type="boolean">true</Arg>
   </New> 
+  
   <New id="MyEnvEntry2" class="org.mortbay.jetty.plus.naming.EnvEntry">
     <Arg>java:/comp/env/defaultUsers</Arg>
     <Arg type="java.lang.String">google-students</Arg>
@@ -41,5 +68,23 @@ http://jetty.mortbay.org/configure.dtd">
             <Set name="config"><SystemProperty name="jetty.home" default="."/>/WEB-INF/realm.properties</Set>
       </New>
     </Set>
-  </Get>
-</Configure>  
+  </Get>-->
+<!--
+  <New id="MyEnvEntry1" class="org.mortbay.jetty.plus.naming.EnvEntry">
+    <Arg>java:/comp/env/repository/directory</Arg>
+    <Arg type="java.lang.String">E:/Photos</Arg>
+  </New> 
+-->
+<New class="org.mortbay.jetty.plus.naming.EnvEntry">
+  <Arg></Arg>
+  <Arg>java:/comp/env/repository/directory</Arg>
+  <Arg type="java.lang.String">E:/Photos</Arg>
+  <Arg type="boolean">true</Arg>
+</New>
+ <New id="MyEnvEntry2" class="org.mortbay.jetty.plus.naming.EnvEntry">
+   <Arg></Arg>
+    <Arg>java:/comp/env/repository/virtual</Arg>
+    <Arg type="java.lang.String">/repo</Arg>
+    <Arg type="boolean">true</Arg>
+  </New> 
+</Configure>
