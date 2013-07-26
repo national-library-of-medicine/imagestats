@@ -47,7 +47,7 @@
   <welcome-file-list>
     <welcome-file>ImageStats.html</welcome-file>
   </welcome-file-list>
-
+<!--
 <security-constraint>
      <web-resource-collection>
           <web-resource-name>Forbidden</web-resource-name>
@@ -79,8 +79,8 @@
         <form-login-page>/login.jsp</form-login-page>
         <form-error-page>/error.jsp</form-error-page>
     </form-login-config>
-</login-config>
-<security-role>
+</login-config>-->
+<!--<security-role>
   <role-name>google-students</role-name>
 </security-role>
 <security-role>
@@ -91,5 +91,19 @@
 </security-role>
 <security-role>
   <role-name>user-role</role-name>
-</security-role>
+</security-role>-->
+<!--<env-entry>
+  <description>Virtual Directory mapped to image Repository in context</description>
+  <env-entry-name>/repository/virtual</env-entry-name>
+  <env-entry-value>/repo</env-entry-value>
+  <env-entry-type>java.lang.String</env-entry-type>
+</env-entry>
+
+<env-entry>
+  <description>Directory name of the Repository.</description>
+  <env-entry-name>/repository/directory</env-entry-name>
+  <env-entry-value>E:/Photos</env-entry-value>
+  <env-entry-type>java.lang.String</env-entry-type>
+</env-entry>-->
+
 </web-app>

@@ -14,13 +14,17 @@ public class UserRoleDB {
 		ds = dataSource;
 	}
 
+	
 	public void setDataSource(DataSource dataSource) {
 		ds = dataSource;
 	}
 
 	public UserRole getUserRole(String username) throws SQLException{
 		UserRole ret = null;
-		
+		ret.setUsername("maggarwal");
+  		ret.setRole("google-students");
+  		ret.setUser_event("tsutest");
+		/*
 			Connection con = null;
 			Statement stmt = null;
 			ResultSet rs = null;
@@ -40,11 +44,11 @@ public class UserRoleDB {
 				}
 				if(con != null)
 				  con.close();
-			}
+			}*/
 
 		return ret;
 	}
-
+/*
 	UserRole extractRow(ResultSet rs) throws SQLException{
 		UserRole ret = new UserRole();
   	if(rs != null && rs.next()) {
@@ -54,5 +58,5 @@ public class UserRoleDB {
   	}
 		
 		return ret;
-	}
+	}*/
 }

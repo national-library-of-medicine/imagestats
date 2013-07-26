@@ -1,8 +1,8 @@
 package gov.nih.nlm.ceb.lpf.imagestats.server;
 
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ISConstants;
-import gov.nih.nlm.ceb.lpf.imagestats.shared.IplImageStats;
-import gov.nih.nlm.ceb.lpf.imagestats.shared.IplImageStatsList;
+//import gov.nih.nlm.ceb.lpf.imagestats.shared.IplImageStats;
+//import gov.nih.nlm.ceb.lpf.imagestats.shared.IplImageStatsList;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLRecord;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.Utils;
 
@@ -50,15 +50,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.googlecode.javacpp.BytePointer;
+//import com.googlecode.javacpp.BytePointer;
 
-import static com.googlecode.javacv.cpp.opencv_core.IplImage;
-import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
+//import static com.googlecode.javacv.cpp.opencv_core.IplImage;
+//import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
 
 @SuppressWarnings("serial")
 public class ImageStatsImpl extends HttpServlet {
 //	SearchPL pl_ws = null;
-	SearchPLUsingSOLR pl = null;
+	//SearchPLUsingSOLR pl = null;
 
 	String defaultUsers = null;
 	//DataSource plstageDataSource = null;
@@ -89,16 +89,19 @@ public class ImageStatsImpl extends HttpServlet {
 		//pl_ws = new SearchPL();
 		//pl_ws.init();
 		try {
-		  pl = new SearchPLUsingSOLR();
-			InitialContext cxt = new InitialContext();
+		  //pl = new SearchPLUsingSOLR();
+			/*InitialContext cxt = new InitialContext();
 			DataSource plDataSource = (DataSource) cxt.lookup( "java:/comp/env/jdbc/pl" );
 			imageStatsDB = new ImageStatsDB(plDataSource);
 			DataSource usersDataSource = (DataSource) cxt.lookup( "java:/comp/env/jdbc/users" );
-			userDB = new UserRoleDB(usersDataSource);
-			pl.setUserDB(userDB);
+			userDB = new UserRoleDB(usersDataSource);*/
+			imageStatsDB = null;
+			userDB = null;
+			//pl.setUserDB(userDB);
 
 			try {
-			  defaultUsers = (String) cxt.lookup( "java:/comp/env/defaultUsers" );
+			  //defaultUsers = (String) cxt.lookup( "java:/comp/env/defaultUsers" );
+				defaultUsers = null;
 			}
 			catch(Exception e) {
 				
@@ -131,7 +134,7 @@ public class ImageStatsImpl extends HttpServlet {
 		String[] imageUrls = request.getParameterValues("url");
 		JsonObject plResults = null;
 		if(imageUrls == null) {
-			plResults = pl.searchForImages(sourceUrl, request);
+			//plResults = pl.searchForImages(sourceUrl, request);
 		}
 		
 		String format = request.getParameter("format");
@@ -165,7 +168,7 @@ public class ImageStatsImpl extends HttpServlet {
 					String [] columns = getImageStats(imageUrls[i]);
 					writeFieldsCSV(response.getWriter(), columns, csv_fs, csv_rs);
 			  }
-			}
+			}/*
 			else {
 				IplImageStatsList statsList = getImageStatsList(sourceUrl, plResults);
 				if(statsList != null) {
@@ -178,15 +181,15 @@ public class ImageStatsImpl extends HttpServlet {
 				    }
 				  }
 				}
-			}
+			}*/
       response.setContentType("text/plain");
       response.setCharacterEncoding("UTF-8");
-		}
+		}/*
 		else if(ISConstants.FORMAT_JSON.equalsIgnoreCase(format)) {
 			IplImageStatsList statsList = getImageStatsList(sourceUrl, plResults);
 			Gson gson = new Gson();
 			gson.toJson(statsList, response.getWriter());
-		}
+		}*/
 		else if(ISConstants.FORMAT_ZIP.equalsIgnoreCase(format)) {
 			if(imageUrls != null && imageUrls.length > 0) {
 			  ZipImages(sourceUrl, imageUrls, response.getOutputStream());
@@ -211,13 +214,13 @@ public class ImageStatsImpl extends HttpServlet {
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				org.w3c.dom.Document domDoc = builder.newDocument();
 
-				org.w3c.dom.Element root = domDoc.createElement("IplImageSet");
+				/*org.w3c.dom.Element root = domDoc.createElement("IplImageSet");
 				domDoc.appendChild(root);
 				for (int i = 0; imageUrls != null && i < imageUrls.length; i++) {
 						Element iplImageEl = getImageStatsDOM(domDoc, imageUrls[i]);
 						iplImageEl.setAttribute("url", imageUrls[i]);
 						root.appendChild(iplImageEl);
-				}
+				}*/
         response.setContentType("text/xml");
         response.setCharacterEncoding("UTF-8");
 				response.getWriter().write(toXMLString(domDoc));
@@ -227,7 +230,7 @@ public class ImageStatsImpl extends HttpServlet {
 			}
 		}
 	}
- 
+ /*
 	public IplImageStatsList getImageStatsList(String sourceServer, JsonObject plResults) throws IOException{
 		// Verify that the input is valid.
 		IplImageStatsList ret = new IplImageStatsList();
@@ -250,8 +253,8 @@ public class ImageStatsImpl extends HttpServlet {
 
 		return ret;
 	}
-
-	public Element getImageStatsDOM(Document domDoc, String urlStr) throws IOException{
+*/
+	/*public Element getImageStatsDOM(Document domDoc, String urlStr) throws IOException{
 		// Verify that the input is valid.
 		Element ret = null;
 		try {
@@ -263,7 +266,7 @@ public class ImageStatsImpl extends HttpServlet {
 		}
 
 		return ret;
-	}
+	}*/
 
 	public String[] getImageStats(String urlStr)
 			throws MalformedURLException, IOException {
@@ -271,7 +274,7 @@ public class ImageStatsImpl extends HttpServlet {
 		String[] ret = new String[]{urlStr};
 		
 		URL u = new URL(urlStr);
-		IplImage iplImage = getIplImage(u);
+		/*IplImage iplImage = getIplImage(u);
 		Integer[] dataElements = getIntegerMembers(iplImage);
 		if (dataElements != null) {
 			ret = new String[dataElements.length + 2]; // Integer elements plus
@@ -281,7 +284,7 @@ public class ImageStatsImpl extends HttpServlet {
 				ret[i] = dataElements[i-1].toString();
 			}
 			ret[dataElements.length+1] = Utils.getColorModel(iplImage);
-		}
+		}*/
 		return ret;
 	}
 
@@ -296,7 +299,7 @@ public class ImageStatsImpl extends HttpServlet {
 	}
 	
 
-	Element toDOMElement(Document domDoc, IplImage iplImage) {
+	/*Element toDOMElement(Document domDoc, IplImage iplImage) {
 		
 		Element ret = domDoc.createElement("IplImage");
 		if(iplImage == null)
@@ -333,16 +336,16 @@ public class ImageStatsImpl extends HttpServlet {
 					ret.appendChild(el);
 				}
 		return ret;
-	}
-	
+	}*/
+	/*
 	IplImage getIplImage(URL imageUrl) throws IOException {
 		File file = getTmpFile(imageUrl);
 		IplImage ret = getIplImage(file.getAbsolutePath());
 		file.delete();
     // read an image  		
 		return ret;
-	}
-
+	}*/
+/*
 	Integer[] getIntegerMembers(IplImage iplImage) {
 		Integer[] ret = null;
 		if (iplImage != null) {
@@ -373,7 +376,7 @@ public class ImageStatsImpl extends HttpServlet {
 
 		return ret;
 	}
-	
+	*/
 	File getTmpFile(URL url) throws IOException {
 		File ret = null;
 		String filename = url.getPath().replace('/', '_');
@@ -423,12 +426,12 @@ public class ImageStatsImpl extends HttpServlet {
 			}
 		  return ret;
 	}
-	
+	/*
 	IplImage getIplImage(String filename) {
 		IplImage ret = cvLoadImage(filename);
     // read an image  		
 		return ret;
-	}
+	}*/
 	
 	
 	String toXMLString(org.w3c.dom.Node node) {
@@ -534,7 +537,9 @@ public class ImageStatsImpl extends HttpServlet {
 	}
 
 	void exportGroundTruthData(String solrServer, String [] imageUrls, HttpServletResponse resp, boolean isFinal) throws IOException {
-		exportGroundTruthData(solrServer, pl.searchWithUrls(solrServer, imageUrls),resp, isFinal);
+		//exportGroundTruthData(solrServer, pl.searchWithUrls(solrServer, imageUrls),resp, isFinal);
+		JsonObject js = null;
+		exportGroundTruthData(solrServer, js,resp, isFinal);
 	}
 	
 	//@Override

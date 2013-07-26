@@ -1,0 +1,15 @@
+1. Make the Project in Eclipse and import the code.
+2. Include the required libraries in the project namely
+	a. gson-2.2.4.jar
+	b. gwt-graphics-1.0.0.jar
+	c. gwt-servlet.jar
+	d. gxt-3.0.1.jar
+	e. jetty-naming-6.1.12.jar
+	f. jetty-plus-6.1.12.jar
+	g. sqlite-jdbc-3.7.2.jar
+3. Compile the Project
+4. Create a virtual repository /path/to/virtual/directory for the directory of the image repository(Sample context file imagestats#repo.xml for Tomcat attached in MISC).
+5. Correct the path of the repository(path/to/actual/repository), database(PLDB.db) and the virtual repository address(/path/to/virtual/directory) in jetty-web.xml, context.xml.
+6.Check in Eclipse if the application is running.
+7. Make a context to run the compiled application from external directory in Tomcat(sample extimagestats.xml attached in MISC), or create a war bundle and deploy in Tomcat.
+8. Run the application in Tomcat.
