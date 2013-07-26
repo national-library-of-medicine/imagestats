@@ -435,7 +435,7 @@ IsWidget {
   	getImageStatsRecord();
 
   	if(!clean) {
-  	  addFaceMatcherBoxes(imageDetailsRecord.getUrl());
+  	  //addFaceMatcherBoxes(imageDetailsRecord.getUrl());
   	}
   }
   
@@ -540,7 +540,7 @@ IsWidget {
   
 
   
-  void addFaceMatcherBoxes(String url) {
+  /*void addFaceMatcherBoxes(String url) {
   	
     if(url.length() > 0) {
     	imagestatsService.getFaceMatchRegions(url, new AsyncCallback<ImageRegionModel[]>() {
@@ -558,7 +558,7 @@ IsWidget {
 			  }
       });
     }
-  }
+  }*/
   
 
 	void drawBoxes(ImageRegionModel[] models) {
