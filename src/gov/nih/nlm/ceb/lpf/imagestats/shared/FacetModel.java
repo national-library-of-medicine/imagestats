@@ -23,6 +23,12 @@ public class FacetModel implements Serializable {
 		displayLabel = label;
 	}
 	
+	public FacetModel(String fieldName, String label, String parentName, int facetCount) {
+		field = fieldName;
+		displayLabel = label;
+		parent = parentName;
+		count = facetCount;
+	}
 	public String getField() {
 		return field;
 	}
