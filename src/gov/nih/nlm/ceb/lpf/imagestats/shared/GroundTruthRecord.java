@@ -9,7 +9,7 @@ public class GroundTruthRecord implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	int image_id = -1;
+	String image_id = "";
 //	String image_url = "";
 	String gt_initial_person = "";
 	String gt_final_person = "";
@@ -22,7 +22,7 @@ public class GroundTruthRecord implements Serializable {
 	public GroundTruthRecord() {
 	}
 
-	public GroundTruthRecord(int imageId, 
+	public GroundTruthRecord(String imageId, 
 			String gtInitialPerson, 
 			String gtFinalPerson,
 			ImageRegionModel[] initialRegions,
@@ -41,7 +41,7 @@ public class GroundTruthRecord implements Serializable {
 	}
 
 	// Setters
-	public void set_image_id(int id) {
+	public void set_image_id(String id) {
 		image_id = id;
 	}
 	
@@ -76,7 +76,7 @@ public class GroundTruthRecord implements Serializable {
 	}
 	
   // Getters
-	public int get_image_id() {
+	public String get_image_id() {
 		return image_id;
 	}
 	

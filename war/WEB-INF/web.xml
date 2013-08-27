@@ -14,14 +14,14 @@
       <res-type>javax.sql.DataSource</res-type>
       <res-auth>Container</res-auth>
   </resource-ref>
-<!--   
+<!--
   <resource-ref>
       <description>User database</description>
       <res-ref-name>java:/comp/env/UserDatabase</res-ref-name>
       <res-type>org.apache.catalina.UserDatabase</res-type>
       <res-auth>Container</res-auth>
-  </resource-ref>
--->  
+  </resource-ref>-->
+
   <!-- Servlets -->
   <servlet>
     <servlet-name>imageStatsServiceServlet</servlet-name>
@@ -47,7 +47,7 @@
   <welcome-file-list>
     <welcome-file>ImageStats.html</welcome-file>
   </welcome-file-list>
-<!--
+
 <security-constraint>
      <web-resource-collection>
           <web-resource-name>Forbidden</web-resource-name>
@@ -56,7 +56,7 @@
           <http-method>DELETE</http-method>
           <http-method>TRACE</http-method>
           <http-method>OPTIONS</http-method>
-     </web-resource-collection>
+     </web-resource-collection>
      <auth-constraint />
 </security-constraint>
 <security-constraint>
@@ -73,14 +73,17 @@
        <role-name>admin</role-name>
      </auth-constraint> 
 </security-constraint>
+
 <login-config>
     <auth-method>FORM</auth-method>
+    <realm-name>MyRealm</realm-name>
     <form-login-config>
         <form-login-page>/login.jsp</form-login-page>
         <form-error-page>/error.jsp</form-error-page>
     </form-login-config>
-</login-config>-->
-<!--<security-role>
+</login-config>
+
+<security-role>
   <role-name>google-students</role-name>
 </security-role>
 <security-role>
@@ -91,7 +94,7 @@
 </security-role>
 <security-role>
   <role-name>user-role</role-name>
-</security-role>-->
+</security-role>
 <!--<env-entry>
   <description>Virtual Directory mapped to image Repository in context</description>
   <env-entry-name>/repository/virtual</env-entry-name>

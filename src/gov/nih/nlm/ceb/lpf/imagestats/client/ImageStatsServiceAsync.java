@@ -62,10 +62,10 @@ public interface ImageStatsServiceAsync {
 	void getFaceMatchRegions(String imageURL,
 			AsyncCallback<ImageRegionModel[]> callback);
 
-	void saveRegionsToDB(int image_id, int groundTruthStatus,
+	void saveRegionsToDB(String image_id, int groundTruthStatus,
 			ImageRegionModel[] regions, AsyncCallback<Void> callback);
 
-	void getGroundTruthFromDB(int image_id, AsyncCallback<GroundTruthRecord> callback);
+	void getGroundTruthFromDB(String image_id, AsyncCallback<GroundTruthRecord> callback);
 	void getHeaders(AsyncCallback<PLSolrParams> callback);
 	void getUser(AsyncCallback<String> callback);
 	void logout(AsyncCallback<Void> callback);

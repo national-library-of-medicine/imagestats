@@ -164,8 +164,13 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		Set<String> EventParams = searchParams.get(ISConstants.FIELD_EVENT_NAME);
 		Set<String> TypeParams = searchParams.get(ISConstants.IMAGE_TYPE);
 		Set<String> GroundTruthParams = searchParams.get(ISConstants.FIELD_GROUNDTRUTH_STATUS);
-		
-		
+		Set<String> NameParams = searchParams.get(ISConstants.FIELD_FULL_NAME);
+		String SearchName = "*";
+		if(NameParams!=null &&NameParams.size()!=0){
+			SearchName = NameParams.iterator().next();
+		}
+		if(SearchName==null||SearchName == "")
+			SearchName = "*";
 		int jpegCount=0, pngCount=0, gifCount=0;
 		int gts0=0, gts1=0, gts2=0, gts3=0;
 		ArrayList<FacetModel> EventFacets= new ArrayList<FacetModel>();
@@ -185,6 +190,8 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
+					if(!matchStringsWithWildCards(SearchName, ImageName))
+						continue;
 					String mimetype="";
 					try{
 				        mimetype = Files.probeContentType(Paths.get(source+"/"+Event+"/"+ImageName));
@@ -196,10 +203,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				        subType = mimetype.split("/")[1];
 					}
 					
-					int id = 0;
-				    for(char s:(source+"/"+Event+"/"+ImageName).toCharArray()){
-				    	id+=s;
-				    }
+					
 				    
 					Connection con = null;
 					Statement st = null;
@@ -209,7 +213,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 						DataSource plDataSource = imageStatsDB.plstageDataSource;
 						con = plDataSource.getConnection();
 						st = con.createStatement();
-						String query = "SELECT * FROM imagestats WHERE image_id="+id;
+						String query = "SELECT * FROM imagestats WHERE image_id=\""+(Event+"/"+ImageName+"\"");
 						rs = st.executeQuery(query);
 						//String final_regions = rs.getString("final_regions");
 						//String initial_regions = rs.getString("initial_regions");
@@ -255,9 +259,9 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		}
 		
 		ArrayList<FacetModel> type = new ArrayList<FacetModel>();
-		type.add(new FacetModel(ISConstants.JPEG_TYPE_QUERY_LABEL,ISConstants.JPEG_TYPE_QUERY_LABEL, ISConstants.FIELD_URL_THUMB, jpegCount));
-		type.add(new FacetModel(ISConstants.PNG_TYPE_QUERY_LABEL,ISConstants.PNG_TYPE_QUERY_LABEL, ISConstants.FIELD_URL_THUMB, pngCount));
-		type.add(new FacetModel(ISConstants.GIF_TYPE_QUERY_LABEL,ISConstants.GIF_TYPE_QUERY_LABEL, ISConstants.FIELD_URL_THUMB, gifCount));
+		type.add(new FacetModel(ISConstants.JPEG_TYPE_QUERY_LABEL,ISConstants.JPEG_TYPE_QUERY_LABEL, ISConstants.IMAGE_TYPE, jpegCount));
+		type.add(new FacetModel(ISConstants.PNG_TYPE_QUERY_LABEL,ISConstants.PNG_TYPE_QUERY_LABEL, ISConstants.IMAGE_TYPE, pngCount));
+		type.add(new FacetModel(ISConstants.GIF_TYPE_QUERY_LABEL,ISConstants.GIF_TYPE_QUERY_LABEL, ISConstants.IMAGE_TYPE, gifCount));
 		
 		ArrayList<FacetModel> gts = new ArrayList<FacetModel>();
 		gts.add(new FacetModel(ISConstants.GROUNDTRUTH_STATUS_ZERO, ClientUtils.getFieldLabel(ISConstants.GROUNDTRUTH_STATUS_ZERO), ISConstants.FIELD_GROUNDTRUTH_STATUS, gts0));
@@ -375,6 +379,28 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		Set<String> EventParams = searchParams.get(ISConstants.FIELD_EVENT_NAME);
 		Set<String> TypeParams = searchParams.get(ISConstants.IMAGE_TYPE);
 		Set<String> GroundTruthParams = searchParams.get(ISConstants.FIELD_GROUNDTRUTH_STATUS);
+		Set<String> NameParams = searchParams.get(ISConstants.FIELD_FULL_NAME);
+		String SearchName = "*";
+		if(NameParams!=null &&NameParams.size()!=0){
+			SearchName = NameParams.iterator().next();
+		}
+		if(SearchName == null || SearchName == "")
+			SearchName = "*";
+		//System.out.println(SearchName);
+		boolean flag = false;
+		for(String s:TypeParams){
+			if(s.equalsIgnoreCase("jpg OR jpeg"))
+				flag = true;
+		}
+		if(flag == true){
+			TypeParams.remove("jpg OR jpeg");
+			TypeParams.add("jpg");
+			TypeParams.add("jpeg");
+		}
+		/*for(String s:TypeParams){
+			System.out.println(s);
+		}*/
+
 		File baseDir = new File(sourceServer);
 		String[] listEvents = baseDir.list();
 		if(listEvents == null)
@@ -390,6 +416,10 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
+					if(!matchStringsWithWildCards(SearchName, ImageName))
+						continue;
+					//if(SearchName.contains(ImageName));
+					//System.out.println(ImageName);
 					String mimetype="";
 					try{
 				        mimetype = Files.probeContentType(Paths.get(sourceServer+"/"+Event+"/"+ImageName));
@@ -437,6 +467,32 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		return retpaging;
 	}
 	
+	
+	private boolean matchStringsWithWildCards(String s1, String s2){
+		
+		String[] a = s1.split("\\*");
+		if(s1.charAt(0)=='*'){
+			if(a.length>0)
+				if(s2.contains(a[0]))
+					s2 = s2.substring(s2.indexOf(a[0]));
+				else
+					return false;
+			
+		}
+		for(String s:a){
+			if(s2.startsWith(s))
+				s2 = s2.replaceFirst(s, "");
+			else{
+				while((!s2.equals("")) && (!s2.startsWith(s)))
+					s2 = s2.substring(1,s2.length());
+				if(s2.equals(""))
+					return false;
+				else
+					s2 = s2.replaceFirst(s, "");
+			}
+		}
+		return true;
+	}
 	private List<PLRecord> sample(List<PLRecord> recordList, int start,
 			int row) {
 		List<PLRecord> ret = new ArrayList<PLRecord>();
@@ -464,7 +520,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 			PLRecord min = it.next();
 			while(it.hasNext()){
 				PLRecord curr = it.next();
-				if(((Integer)curr.get_image_id()).compareTo(min.get_image_id())<0){
+				if((curr.get_image_id()).compareTo(min.get_image_id())<0){
 					min = curr;
 				}
 				
@@ -493,11 +549,8 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 	    ret.setEventName(imageFile.getParentFile().getName());
 	    ret.setName(imageFile.getName());
 	    ret.setUrl_thumb(virtualAddress+"/"+ret.getEventName()+"/"+ret.getName());
-	    int id = 0;
-	    for(char s:ImageUrl.toCharArray()){
-	    	id+=s;
-	    }
-	    ret.set_image_id(id);
+	    
+	    ret.set_image_id(ret.getEventName()+"/"+ret.getName());
 	    ret.setUrl(virtualAddress+"/"+ret.getEventName()+"/"+ret.getName());
 		ret.setColorChannels(3);
 		
@@ -508,7 +561,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 			DataSource plDataSource = imageStatsDB.plstageDataSource;
 			con = plDataSource.getConnection();
 			st = con.createStatement();
-			String query = "SELECT * FROM imagestats WHERE image_id="+id;
+			String query = "SELECT * FROM imagestats WHERE image_id=\""+(ret.getEventName()+"/"+ret.getName())+"\"";
 			rs = st.executeQuery(query);
 			//String final_regions = rs.getString("final_regions");
 			//String initial_regions = rs.getString("initial_regions");
@@ -912,7 +965,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public void saveRegionsToDB(int image_id, int groundTruthStatus, ImageRegionModel[] regions) throws ImageStatsException {
+	public void saveRegionsToDB(String image_id, int groundTruthStatus, ImageRegionModel[] regions) throws ImageStatsException {
 		try {
 			String authorName = getUser();
 			if(authorName == null || authorName.trim().length() == 0) {
@@ -931,7 +984,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 
 	
 	@Override
-	public GroundTruthRecord getGroundTruthFromDB(int image_id) throws ImageStatsException{
+	public GroundTruthRecord getGroundTruthFromDB(String image_id) throws ImageStatsException{
 		try {
 		  return imageStatsDB.getGroundTruthRecordWithId(image_id);
 		}
