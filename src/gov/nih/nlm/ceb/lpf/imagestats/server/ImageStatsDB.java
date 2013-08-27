@@ -31,7 +31,7 @@ public class ImageStatsDB {
 		plstageDataSource = ds;
 	}
 	
-	public GroundTruthRecord getGroundTruthRecordWithId(int image_id) throws SQLException{
+	public GroundTruthRecord getGroundTruthRecordWithId(String image_id) throws SQLException{
 		GroundTruthRecord ret = null;
 		Connection con = null;
 		Statement stmt = null;
@@ -41,7 +41,7 @@ public class ImageStatsDB {
 			con = plstageDataSource.getConnection();
 			String sql = "select * from imagestats where image_id=?";
 		  PreparedStatement pstmt = con.prepareStatement(sql.toString());
-		  pstmt.setInt(1, image_id);
+		  pstmt.setString(1, image_id);
 			rs = pstmt.executeQuery();
 			ret = extractRow(rs);
 		}		finally{
@@ -88,7 +88,7 @@ public class ImageStatsDB {
   		ImageRegionModel[] initial_regions = Utils.parseToRegionModels(rs.getString("initial_regions"));
   		ImageRegionModel[] final_regions = Utils.parseToRegionModels(rs.getString("final_regions"));
   		ret = new GroundTruthRecord(
-  				rs.getInt("image_id"),
+  				rs.getString("image_id"),
 //  				rs.getString("image_url"),
   				rs.getString("gt_initial_person"),
   				rs.getString("gt_final_person"),
@@ -103,7 +103,7 @@ public class ImageStatsDB {
   	return ret;
   }
   
-	public void saveRegions(int image_id, String authorName, int groundTruthStatus, ImageRegionModel[] regions) throws SQLException {
+	public void saveRegions(String image_id, String authorName, int groundTruthStatus, ImageRegionModel[] regions) throws SQLException {
 		Connection con = null;
 		try {
 			con = plstageDataSource.getConnection();
@@ -136,7 +136,7 @@ public class ImageStatsDB {
 						sql.append("values (?, ?, ?, ?, ?, ?, ?, ?)");
 
 				  PreparedStatement pstmt = con.prepareStatement(sql.toString());
-				  pstmt.setInt(1, row.get_image_id());
+				  pstmt.setString(1, row.get_image_id());
 				  pstmt.setString(2, row.get_gt_initial_person());
 				  pstmt.setString(3, row.get_gt_final_person());
 				  pstmt.setString(4, ClientUtils.arrayToString(row.get_initial_regions()));

@@ -59,7 +59,31 @@
     username="" 
     password="" 
     driverClassName="org.sqlite.JDBC"
-    url="jdbc:sqlite:/C:/apache-tomcat-7.0.41/webapps/imagestats/PLDB.db"/>
+    url="jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/PLDB.db"/>
+
+
+    <!--<Resource 
+    name="jdbc/users" 
+    auth="Container" 
+    type="javax.sql.DataSource"
+    maxActive="100" 
+    maxIdle="30" 
+    maxWait="10000"
+    validationQuery="SELECT 1"
+    testOnBorrow="true"
+    testWhileIdle="false"
+    username="" 
+    password="" 
+    driverClassName="org.sqlite.JDBC"
+    url="jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/UserDB.db"/>-->
+
+     <Realm className="org.apache.catalina.realm.JDBCRealm"
+   driverName="org.sqlite.JDBC"
+   connectionURL="jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/UserDB.db"
+   connectionName=""
+   connectionPassword=""
+   userTable="users" userNameCol="username" userCredCol="password"
+   userRoleTable="user_roles" roleNameCol="role" />
 <!--
   <Resource 
     name="jdbc/users" 
@@ -75,6 +99,7 @@
     password="" 
     driverClassName="com.mysql.jdbc.Driver"
     url="jdbc:mysql://lhce-pl-db.nlm.nih.gov:3306/tomcat_users?autoReconnect=true"/>
+
 
     
    <Realm className="org.apache.catalina.realm.JDBCRealm"
@@ -94,6 +119,8 @@
 <Environment name="/repository/directory" value="E:/Photos"
          type="java.lang.String" />
   
-   <Environment name="/repository/virtual" value="/repo"
+   <Environment name="/repository/virtual" value="repo"
          type="java.lang.String" />  
+  
+
 </Context>

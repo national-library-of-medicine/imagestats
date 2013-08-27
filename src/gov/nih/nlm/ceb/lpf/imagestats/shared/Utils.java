@@ -166,7 +166,7 @@ public class Utils {
 		je = jsonDoc.get(ISConstants.FIELD_IMAGE_ID);
   	if(je != null && !je.isJsonNull()) {
     	int image_id = je.getAsInt();
-	  	record.set_image_id(image_id);
+	  	record.set_image_id(Integer.toString(image_id));
   	}
   	je = jsonDoc.get(ISConstants.FIELD_GT_INITIAL_PERSON);
   	if(je != null && !je.isJsonNull()) {

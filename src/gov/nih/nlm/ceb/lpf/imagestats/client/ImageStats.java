@@ -14,6 +14,7 @@ import javax.naming.NamingException;
 import gov.nih.nlm.ceb.lpf.imagestats.client.PLLoadResultListStoreBinding;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ClientUtils;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.FacetModel;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.ISConstants;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ImageStatsException;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLRecord;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLSolrParams;
@@ -219,7 +220,9 @@ public class ImageStats implements IsWidget, EntryPoint {
       		solrParams.add("rows", String.valueOf(loadConfig.getLimit()));
       		//String source = sourceMap.get(sourceListBox.getValue().getValue());
       		String source="";
-    	    
+      		String x = searchBox.getCurrentValue();
+      		solrParams.add(ISConstants.FIELD_FULL_NAME, x);
+    	    //System.out.println(searchBox.get);
       	  imageStatsService.searchSOLRForPaging(source, solrParams, callback);
       	}
       	catch (IOException ioe) {
@@ -290,7 +293,7 @@ public class ImageStats implements IsWidget, EntryPoint {
     VerticalLayoutContainer vcon = new VerticalLayoutContainer();
     BorderLayoutData northData = new BorderLayoutData(100);
     northData.setMargins(new Margins(25));
-    //createBanner(); 
+    createBanner(); 
     mainPanel.setNorthWidget(banner, northData);
 
     BorderLayoutData westData = new BorderLayoutData(260);
@@ -373,7 +376,7 @@ public class ImageStats implements IsWidget, EntryPoint {
     });
 
     searchBox.setAllowBlank(false);
-    searchBox.setText("*:*");
+    searchBox.setText("*");
     searchlayout.add(searchBox);
 		searchlayout.add(searchButton);
 		searchlayout.add(createLogout());
@@ -443,6 +446,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 
 	PLSolrParams buildFacetFilters() {
 		List<FacetModel> selected = facetTree.getCheckedSelection();
+		
 		return buildFacetFilters(selected);
 	}
 	
@@ -522,7 +526,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 
 	
 	void createBanner() {
-    banner.setStyleName(style.homeBanner(), true);
+    banner.setStyleName(style.homeBanner(), false);
 		imageStatsService.getUser(new AsyncCallback<String>(){
 
 			@Override

@@ -36,7 +36,7 @@ public class PLRecord implements Serializable {
                                      // 2 => initial ground truth 
                                      // 3 => final ground truth
 
-	private int image_id = -1;
+	private String image_id = "";
 	private String gt_initial_person = "";
 	private String gt_final_person = "";
 	private ImageRegionModel[] initial_regions = new ImageRegionModel[0];
@@ -187,7 +187,7 @@ public class PLRecord implements Serializable {
   
   
 	// Setters
-	public void set_image_id(int id) {
+	public void set_image_id(String id) {
 		image_id = id;
 	}
 	
@@ -221,7 +221,7 @@ public class PLRecord implements Serializable {
 	}
 	
   // Getters
-	public int get_image_id() {
+	public String get_image_id() {
 		return image_id;
 	}
 	
