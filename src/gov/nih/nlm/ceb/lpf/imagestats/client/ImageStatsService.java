@@ -38,8 +38,8 @@ public interface ImageStatsService extends RemoteService {
 			String sortBy) throws IOException;
 			*/
 	ImageRegionModel[] getFaceMatchRegions(String imageURL);
-	void saveRegionsToDB(int image_id, int groundTruthStatus, ImageRegionModel[] regions) throws ImageStatsException;
-	GroundTruthRecord getGroundTruthFromDB(int image_id) throws ImageStatsException;
+	void saveRegionsToDB(String image_id, int groundTruthStatus, ImageRegionModel[] regions) throws ImageStatsException;
+	GroundTruthRecord getGroundTruthFromDB(String image_id) throws ImageStatsException;
 	PLSolrParams getHeaders();
 	String getUser();
 	void logout();
