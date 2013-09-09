@@ -376,7 +376,7 @@ public class ImageStats implements IsWidget, EntryPoint {
     });
 
     searchBox.setAllowBlank(false);
-    searchBox.setText("*");
+    searchBox.setText("*:*");
     searchlayout.add(searchBox);
 		searchlayout.add(searchButton);
 		searchlayout.add(createLogout());

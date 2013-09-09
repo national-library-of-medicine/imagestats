@@ -190,7 +190,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
-					if(!matchStringsWithWildCards(SearchName, ImageName))
+					if(!searchBoxCriteria(SearchName, ImageName, Event))
 						continue;
 					String mimetype="";
 					try{
@@ -416,7 +416,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
-					if(!matchStringsWithWildCards(SearchName, ImageName))
+					if(!searchBoxCriteria(SearchName, ImageName, Event))
 						continue;
 					//if(SearchName.contains(ImageName));
 					//System.out.println(ImageName);
@@ -467,6 +467,51 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		return retpaging;
 	}
 	
+	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory){
+		String tempSearchName = searchName.toLowerCase().replaceAll("\\s","");
+		ImageName = ImageName.toLowerCase().replaceAll("\\s","");
+		Directory = Directory.toLowerCase().replaceAll("\\s","");
+		if((tempSearchName.toLowerCase()).startsWith("image_id:")){
+			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
+			String[] searchArray = searchString.split(" ");
+			for(String s:searchArray)
+				if( matchStringsWithWildCards(s, Directory+"/"+ImageName))
+					return true;
+			return false;
+		}
+		else if((tempSearchName.toLowerCase()).startsWith("image_name:")){
+			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
+			String[] searchArray = searchString.split(" ");
+			for(String s:searchArray)
+				if( matchStringsWithWildCards(s, ImageName))
+					return true;
+			return false;
+		}
+		else if((tempSearchName.toLowerCase()).startsWith("event_name:")){
+			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
+			String[] searchArray = searchString.split(" ");
+			for(String s:searchArray)
+				if( matchStringsWithWildCards(s, Directory))
+					return true;
+			return false;
+		}
+		else if((tempSearchName.toLowerCase()).startsWith("*:")){
+			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
+			String[] searchArray = searchString.split(" ");
+			for(String s:searchArray)
+				if( matchStringsWithWildCards(s, Directory+"/"+ImageName))
+					return true;
+			return false;
+		}
+		else{
+			String searchString = searchName.trim();
+			String[] searchArray = searchString.split(" ");
+			for(String s:searchArray)
+				if( matchStringsWithWildCards(s, Directory+"/"+ImageName))
+					return true;
+			return false;
+		}
+	}
 	
 	private boolean matchStringsWithWildCards(String s1, String s2){
 		

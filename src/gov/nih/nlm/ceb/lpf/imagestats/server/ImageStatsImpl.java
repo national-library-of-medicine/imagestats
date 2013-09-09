@@ -1,9 +1,16 @@
 package gov.nih.nlm.ceb.lpf.imagestats.server;
 
+import gov.nih.nlm.ceb.lpf.imagestats.client.ImageStatsService;
+import gov.nih.nlm.ceb.lpf.imagestats.client.ImageStatsServiceAsync;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ISConstants;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.PLPagingLoadResultBean;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.ClientUtils;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.FacetModel;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.ImageStatsException;
 //import gov.nih.nlm.ceb.lpf.imagestats.shared.IplImageStats;
 //import gov.nih.nlm.ceb.lpf.imagestats.shared.IplImageStatsList;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLRecord;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.PLSolrParams;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.Utils;
 
 import java.awt.image.BufferedImage;
@@ -19,8 +26,12 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -51,9 +62,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 //import com.googlecode.javacpp.BytePointer;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.sencha.gxt.widget.core.client.box.MessageBox;
 
 //import static com.googlecode.javacv.cpp.opencv_core.IplImage;
 //import static com.googlecode.javacv.cpp.opencv_highgui.cvLoadImage;
+
+
 
 @SuppressWarnings("serial")
 public class ImageStatsImpl extends HttpServlet {
@@ -62,6 +78,11 @@ public class ImageStatsImpl extends HttpServlet {
 
 	String defaultUsers = null;
 	//DataSource plstageDataSource = null;
+
+	private final ImageStatsServiceAsync imageStatsService = GWT
+			.create(ImageStatsService.class);
+	
+UserRoleDB userroles = null;
 
 	static String [] iplImageElementsInt = {
 		"nChannels",
@@ -129,7 +150,13 @@ public class ImageStatsImpl extends HttpServlet {
 
 	void invokeServlet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		try{
+			InitialContext cxt = new InitialContext();
 
+			DataSource usersDataSource = (DataSource) cxt.lookup( "java:/comp/env/jdbc/users" );
+
+			userroles = new UserRoleDB(usersDataSource);
+			}catch(Exception e){System.out.println("Database Not Configured Properly");}
 		String sourceUrl = request.getParameter("sourceUrl");
 		String[] imageUrls = request.getParameterValues("url");
 		JsonObject plResults = null;
@@ -202,10 +229,10 @@ public class ImageStatsImpl extends HttpServlet {
 				ISConstants.FINAL_FORMAT_GROUNDTRUTH_CSV.equalsIgnoreCase(format)) {
 			boolean isFinal = ISConstants.FINAL_FORMAT_GROUNDTRUTH_CSV.equalsIgnoreCase(format);
 			if(imageUrls != null && imageUrls.length > 0) {
-			  exportGroundTruthData(sourceUrl, imageUrls, response, isFinal);
+			  exportGroundTruthData(sourceUrl, imageUrls, request, response, isFinal);
 			}
 			else {
-				exportGroundTruthData(sourceUrl, plResults, response, isFinal);
+				exportGroundTruthData(sourceUrl, plResults, request, response, isFinal);
 			}
 		}
 		else {
@@ -513,10 +540,11 @@ public class ImageStatsImpl extends HttpServlet {
     input.close();
 	}
 	
-	void exportGroundTruthData(String sourceServer, JsonObject plResults, HttpServletResponse resp, boolean isFinal) throws IOException {
-    String cvs_fs = "\t";
-    String cvs_rs = "\n";
+	void exportGroundTruthData(String sourceServer, JsonObject plResults, HttpServletRequest request, final HttpServletResponse resp, final boolean isFinal) throws IOException {
+    final String cvs_fs = "\t";
+    final String cvs_rs = "\n";
     String outputfile = defaultUsers;
+    if(plResults == null){
 		JsonArray resultSet = plResults.getAsJsonObject("response").getAsJsonArray("docs");
 		Iterator<JsonElement> iter = resultSet.iterator();
 		if(iter.hasNext()) {
@@ -533,13 +561,83 @@ public class ImageStatsImpl extends HttpServlet {
 				writeFieldsCSV(resp.getWriter(), rec.getGTColumns(isFinal), cvs_fs,
 						cvs_rs);
 		}
+    }
+    else{
+    	PLSolrParams searchparams = null;
+    	
+    	
+    	
+
+		PLSolrParams urlparams = new PLSolrParams();
+		urlparams.add("qt", "edismax");
+		urlparams.add("wt", "json");
+	  urlparams.add("sort", "created desc");
+		urlparams.add("fq", "url_thumb:[* TO *]");
+	  addUserEventFilter(urlparams, Utils.getUser(request));
+		
+//	  urlparams.add("sort", "expiry_date desc");
+	  Enumeration<String> en = (Enumeration<String>) request.getParameterNames();
+	  while(en.hasMoreElements()) {
+	  	String n = en.nextElement();
+	  	String [] vals = request.getParameterValues(n);
+	  	urlparams.add(n, vals);
+	  }
+    	
+    	
+    	
+    	//PLPagingLoadResultBean results = searchSOLRForPaging("", searchparams);
+    	imageStatsService
+		.searchSOLRForPaging("", searchparams, new AsyncCallback<PLPagingLoadResultBean>() {
+
+			public void onFailure(Throwable t) {
+        String details = t.getMessage();
+        MessageBox m = new MessageBox(details);
+        
+        if (t instanceof ImageStatsException) {
+          m.setMessage(((ImageStatsException)t).getISMessage());
+        }
+      m.show();
+			}
+
+			public void onSuccess(PLPagingLoadResultBean eventList) {
+				if(eventList!=null){
+					ArrayList<PLRecord> RecordList = (ArrayList<PLRecord>)eventList.getData();
+					Iterator<PLRecord> iter = RecordList.iterator();
+				while (iter.hasNext()) {
+						PLRecord rec = iter.next();
+						try{
+							writeFieldsCSV(resp.getWriter(), rec.getGTColumns(isFinal), cvs_fs,
+								cvs_rs);
+						}catch(Exception e){MessageBox m = new MessageBox(e.getMessage());
+											m.setMessage("Error Fetching Data");
+											m.show();}
+				}
+				}
+			}
+		});
+    }
 		//resp.addHeader("Content-Disposition", "attachment; filename=\"imagestats."+outputfile+"\"");
 	}
 
-	void exportGroundTruthData(String solrServer, String [] imageUrls, HttpServletResponse resp, boolean isFinal) throws IOException {
+	void exportGroundTruthData(String solrServer, String [] imageUrls, HttpServletRequest request,  HttpServletResponse resp, boolean isFinal) throws IOException {
 		//exportGroundTruthData(solrServer, pl.searchWithUrls(solrServer, imageUrls),resp, isFinal);
 		JsonObject js = null;
-		exportGroundTruthData(solrServer, js,resp, isFinal);
+		exportGroundTruthData(solrServer, js, request, resp, isFinal);
+	}
+	
+	void addUserEventFilter(PLSolrParams urlParameters, String user) {
+		if(userroles != null) {
+			try {
+			  UserRole role = userroles.getUserRole(user);
+			  String event = role.getUser_event();
+			  if(event != null && event.trim().length() > 0) {
+			    urlParameters.add("fq", "shortname:"+event);
+			  }
+			}
+			catch (SQLException sqle) {
+				
+			}
+		}
 	}
 	
 	//@Override
