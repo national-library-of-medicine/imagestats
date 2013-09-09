@@ -12,6 +12,7 @@ import org.vaadin.gwtgraphics.client.VectorObject;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -47,14 +48,17 @@ public class MoveBoundingBoxHandler implements MouseDownHandler,
 			 event.getY() >= rect.getHeight()) {
 		  mode = 3;
 		  rect.setStyleName(style.box_resize_corner());
+		  //rect.getElement().getStyle().setCursor(Cursor.N_RESIZE);
 		}
 		else if(event.getY() >= rect.getHeight()) {
 			mode = 2;
 		  rect.setStyleName(style.box_resize_bottom());
+		  //rect.getElement().getStyle().setCursor(Cursor.N_RESIZE);
 		}
 		else if(event.getX() >= rect.getWidth()) {
 			mode = 1;
 		  rect.setStyleName(style.box_resize_right());
+		  //rect.getElement().getStyle().setCursor(Cursor.E_RESIZE);
 		}
 		else { 
 			mode = 0;

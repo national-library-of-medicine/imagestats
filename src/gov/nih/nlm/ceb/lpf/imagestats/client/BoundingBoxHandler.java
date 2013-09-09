@@ -10,6 +10,7 @@ import org.vaadin.gwtgraphics.client.VectorObject;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -75,9 +76,11 @@ import com.google.gwt.resources.client.CssResource;
 			//@Override
 			public void onMouseMove(MouseMoveEvent event) {
 				AnnotationBox source = (AnnotationBox) event.getSource();
+				int ex = event.getX();
+				int ey = event.getY();
+				if(ex != source.getWidth()||ey!=source.getHeight())
+					source.getElement().getStyle().setCursor(Cursor.CROSSHAIR);
 				if(started) {
-					int ex = event.getX();
-					int ey = event.getY();
 					x = (ex);
 					y = (ey);
 					source.setX(x);
@@ -137,7 +140,15 @@ import com.google.gwt.resources.client.CssResource;
 			public void onMouseOver(MouseOverEvent event) {
 				Shape source = (Shape) event.getSource();
 				source.setFillOpacity(0.2);
-			  
+				int x = event.getX();
+				int y = event.getY();
+				if(y >=((AnnotationBox)(event.getSource())).getHeight()){
+					source.getElement().getStyle().setCursor(Cursor.N_RESIZE);
+				}
+				else if(x >= ((AnnotationBox)(event.getSource())).getWidth())
+					source.getElement().getStyle().setCursor(Cursor.E_RESIZE);
+				else
+					source.getElement().getStyle().setCursor(Cursor.DEFAULT);
 			  //debugText.setText(source.getStyleName());
 			}
 
