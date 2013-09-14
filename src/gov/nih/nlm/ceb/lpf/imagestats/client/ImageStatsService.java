@@ -9,6 +9,7 @@ import gov.nih.nlm.ceb.lpf.imagestats.shared.GroundTruthRecord;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ImageStatsException;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLPagingLoadResultBean;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLSolrParams;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.RunTimeException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;

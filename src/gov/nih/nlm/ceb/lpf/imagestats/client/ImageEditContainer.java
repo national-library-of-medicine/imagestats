@@ -188,7 +188,7 @@ IsWidget {
  
     });
     
-    buttonBar.add(restoreInitialButton, vBoxData);
+    //buttonBar.add(restoreInitialButton, vBoxData);
  
     restoreFinalButton = createButton("Restore", new SelectHandler() {
 			@Override
@@ -211,7 +211,7 @@ IsWidget {
     // TODO Kludge - Disable initial save for gciusers. 
     saveInitialButton.disable();
 
-    buttonBar.add(saveInitialButton, vBoxData);
+    //buttonBar.add(saveInitialButton, vBoxData);
 
     saveFinalButton = createButton("Save", new SelectHandler() {
 			@Override
@@ -285,8 +285,11 @@ IsWidget {
 			public void onSelect(SelectEvent event) {
 				ListView<PLRecord, PLRecord> view = resultsView.getListView();
 				if(cellContext.getIndex() > 0) {
+					authorTypeHolder.setValue(true, false);
+					  saveEditsToDB();
 				  XElement el = view.getElement(cellContext.getIndex() - 1);
 				  fireDblClick(el);
+				  
 				}
 				/*
 				else {
@@ -304,6 +307,8 @@ IsWidget {
 			public void onSelect(SelectEvent event) {
 				ListView<PLRecord, PLRecord> view = resultsView.getListView();
 				if(cellContext.getIndex() < (view.getItemCount() - 1)) {
+					authorTypeHolder.setValue(true, false);
+					  saveEditsToDB();
 				  XElement el = view.getElement(cellContext.getIndex() + 1);
 				  fireDblClick(el);
 				}
