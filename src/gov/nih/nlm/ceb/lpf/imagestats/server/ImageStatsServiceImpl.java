@@ -49,6 +49,7 @@ import gov.nih.nlm.ceb.lpf.imagestats.shared.GroundTruthRecord;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLPagingLoadResultBean;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLRecord;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLSolrParams;
+import gov.nih.nlm.ceb.lpf.imagestats.shared.RunTimeException;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.Utils;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ImageStatsException;
 
@@ -190,8 +191,10 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
+					try{
 					if(!searchBoxCriteria(SearchName, ImageName, Event))
 						continue;
+					}catch(Exception e){}
 					String mimetype="";
 					try{
 				        mimetype = Files.probeContentType(Paths.get(source+"/"+Event+"/"+ImageName));
@@ -416,8 +419,10 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
+				
 					if(!searchBoxCriteria(SearchName, ImageName, Event))
 						continue;
+					
 					//if(SearchName.contains(ImageName));
 					//System.out.println(ImageName);
 					String mimetype="";
@@ -467,49 +472,61 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		return retpaging;
 	}
 	
-	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory){
-		String tempSearchName = searchName.toLowerCase().replaceAll("\\s","");
-		ImageName = ImageName.toLowerCase().replaceAll("\\s","");
-		Directory = Directory.toLowerCase().replaceAll("\\s","");
-		if((tempSearchName.toLowerCase()).startsWith("image_id:")){
-			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
-			String[] searchArray = searchString.split(" ");
+	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory) throws ImageStatsException{
+		String[] tempSearchName = searchName.toLowerCase().split(":");
+		
+		ImageName = ImageName.toLowerCase();
+		Directory = Directory.toLowerCase();
+		if(tempSearchName.length == 2){
+			
+			String field_name = tempSearchName[0].trim();
+			String query_text = tempSearchName[1].trim();
+			if(query_text==""){
+				//TODO Throw an error Query Text not correct.
+				throw new ImageStatsException("Query Text Empty");
+			}
+		if(field_name.equals("image_id")||field_name.equals("*")){
+			String[] searchArray = query_text.split(" ");
 			for(String s:searchArray)
 				if( matchStringsWithWildCards(s, Directory+"/"+ImageName))
 					return true;
 			return false;
 		}
-		else if((tempSearchName.toLowerCase()).startsWith("image_name:")){
-			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
-			String[] searchArray = searchString.split(" ");
+		else if(field_name.equals("image_name")){
+			String[] searchArray = query_text.split(" ");
 			for(String s:searchArray)
 				if( matchStringsWithWildCards(s, ImageName))
 					return true;
 			return false;
 		}
-		else if((tempSearchName.toLowerCase()).startsWith("event_name:")){
-			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
-			String[] searchArray = searchString.split(" ");
+		else if(field_name.equals("event_name")){
+			String[] searchArray = query_text.split(" ");
 			for(String s:searchArray)
 				if( matchStringsWithWildCards(s, Directory))
 					return true;
 			return false;
 		}
-		else if((tempSearchName.toLowerCase()).startsWith("*:")){
-			String searchString = searchName.substring(searchName.indexOf(':')+1).trim();
-			String[] searchArray = searchString.split(" ");
+		else{
+			//TODO Throw an error, field_name not valid.
+			throw new ImageStatsException("Field Name not valid.");
+
+		}
+		
+		}
+		else if(tempSearchName.length == 1){
+			if(tempSearchName[0].trim()==""){
+				//TODO Throw an error Query Text not correct.
+				throw new ImageStatsException("Search Text Empty");
+			}
+			String[] searchArray = tempSearchName[0].trim().split(" ");
 			for(String s:searchArray)
-				if( matchStringsWithWildCards(s, Directory+"/"+ImageName))
+				if( matchStringsWithWildCards(s, Directory))
 					return true;
 			return false;
 		}
 		else{
-			String searchString = searchName.trim();
-			String[] searchArray = searchString.split(" ");
-			for(String s:searchArray)
-				if( matchStringsWithWildCards(s, Directory+"/"+ImageName))
-					return true;
-			return false;
+			//TODO Throw an error.
+			throw new ImageStatsException("More than 1 Field Qualifiers present.");
 		}
 	}
 	

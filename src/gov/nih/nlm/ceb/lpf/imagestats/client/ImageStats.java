@@ -339,6 +339,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 					.searchSOLRForEvents(source, solrParams, new AsyncCallback<Map<String, List<FacetModel>>>() {
 
 						public void onFailure(Throwable t) {
+							System.out.println("Reached Client Side.");
 			        String details = t.getMessage();
 			        MessageBox m = new MessageBox(details);
 			        
@@ -362,8 +363,8 @@ public class ImageStats implements IsWidget, EntryPoint {
 							facetTree.expandAll();
 						}
 					});
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 
 		searchBox.addKeyDownHandler(new KeyDownHandler(){
