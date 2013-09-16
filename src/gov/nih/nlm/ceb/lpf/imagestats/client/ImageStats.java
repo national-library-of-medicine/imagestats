@@ -57,6 +57,7 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.StringLabelProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.loader.LoadEvent;
+import com.sencha.gxt.data.shared.loader.LoadExceptionEvent;
 import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 import com.sencha.gxt.data.shared.loader.PagingLoader;
 import com.sencha.gxt.widget.core.client.Component;
@@ -225,8 +226,8 @@ public class ImageStats implements IsWidget, EntryPoint {
     	    //System.out.println(searchBox.get);
       	  imageStatsService.searchSOLRForPaging(source, solrParams, callback);
       	}
-      	catch (IOException ioe) {
-      		MessageBox m = new MessageBox(ioe.getMessage());
+      	catch (Throwable t) {
+      		MessageBox m = new MessageBox(t.getMessage());
       		m.setTitle("Error from PL server");
       		m.show();
       	}
@@ -252,6 +253,16 @@ public class ImageStats implements IsWidget, EntryPoint {
     	}
     };
     resultsLoader.addLoadHandler(plStoreBinder);
+    resultsLoader.addLoadExceptionHandler(
+      new LoadExceptionEvent.LoadExceptionHandler<PagingLoadConfig>() {
+    	  public void onLoadException(LoadExceptionEvent<PagingLoadConfig> event) {
+        		MessageBox m = new MessageBox(event.getException().getMessage());
+          		m.setTitle("Error from PL server");
+          		m.show();
+				resetProgress();
+    	  }
+      }
+    );
 
     final PLRecordListView resultsDisplay = new PLRecordListView(
     		resultStore, 

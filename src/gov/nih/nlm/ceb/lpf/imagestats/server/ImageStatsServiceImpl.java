@@ -49,7 +49,6 @@ import gov.nih.nlm.ceb.lpf.imagestats.shared.GroundTruthRecord;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLPagingLoadResultBean;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLRecord;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.PLSolrParams;
-import gov.nih.nlm.ceb.lpf.imagestats.shared.RunTimeException;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.Utils;
 import gov.nih.nlm.ceb.lpf.imagestats.shared.ImageStatsException;
 
