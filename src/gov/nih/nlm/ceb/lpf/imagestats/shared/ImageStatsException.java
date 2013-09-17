@@ -14,10 +14,15 @@ public class ImageStatsException extends Exception implements java.io.Serializab
 	}
 
 	public ImageStatsException(String msg) {
+		this();
 		localMessage = msg;
 	}
 
 	public String getISMessage() {
+		return localMessage;
+	}
+	
+	public String getMessage(){
 		return localMessage;
 	}
 }
