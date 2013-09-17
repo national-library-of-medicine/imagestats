@@ -564,9 +564,6 @@ UserRoleDB userroles = null;
     }
     else{
     	PLSolrParams searchparams = null;
-    	
-    	
-    	
 
 		PLSolrParams urlparams = new PLSolrParams();
 		urlparams.add("qt", "edismax");

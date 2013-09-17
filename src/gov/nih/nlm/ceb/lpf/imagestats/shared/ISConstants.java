@@ -5,7 +5,7 @@ import java.io.Serializable;
 public interface ISConstants extends Serializable {
 	//public final static String FIELD_SHORTNAME = "name"; 
 	public final static String FIELD_EVENT_SHORT_NAME = "shortname"; 
-	public final static String FIELD_NAME_LABEL = "Event List"; 
+	public final static String FIELD_NAME_LABEL = "Image Collections"; 
 	public final static String FIELD_COLOR_CHANNELS = "color_channels"; 
 	public final static String FIELD_COLOR_CHANNELS_LABEL = "Color Channels"; 
 	public final static String FIELD_IMAGE_WIDTH = "image_width"; 
@@ -78,10 +78,10 @@ public interface ISConstants extends Serializable {
 	public final static String GROUNDTRUTH_STATUS_ONE = "1";
 	public final static String GROUNDTRUTH_STATUS_TWO = "2";
 	public final static String GROUNDTRUTH_STATUS_THREE = "3";
-	public final static String GROUNDTRUTH_STATUS_NOT_DONE = "Not Done";
-	public final static String GROUNDTRUTH_STATUS_FM_SAVED = "Saved from FaceMatcher";
-	public final static String GROUNDTRUTH_STATUS_INITIAL_DONE = "Initiated";
-	public final static String GROUNDTRUTH_STATUS_FINAL_DONE = "Completed";
+	public final static String GROUNDTRUTH_STATUS_NOT_DONE = "Not Done(Light Gray)";
+	public final static String GROUNDTRUTH_STATUS_FM_SAVED = "Saved from FaceMatcher(Yellow)";
+	public final static String GROUNDTRUTH_STATUS_INITIAL_DONE = "Initiated(Yellow)";
+	public final static String GROUNDTRUTH_STATUS_FINAL_DONE = "Completed(Green)";
 	
 	public final static String FORMAT_ZIP = "zip";
 	public final static String FORMAT_CSV = "csv";

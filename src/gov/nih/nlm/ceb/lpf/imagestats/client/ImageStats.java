@@ -57,6 +57,7 @@ import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.StringLabelProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.loader.LoadEvent;
+import com.sencha.gxt.data.shared.loader.LoadExceptionEvent;
 import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
 import com.sencha.gxt.data.shared.loader.PagingLoader;
 import com.sencha.gxt.widget.core.client.Component;
@@ -252,7 +253,17 @@ public class ImageStats implements IsWidget, EntryPoint {
     	}
     };
     resultsLoader.addLoadHandler(plStoreBinder);
-
+    resultsLoader.addLoadExceptionHandler(
+    	      new LoadExceptionEvent.LoadExceptionHandler<PagingLoadConfig>() {
+    	    	  public void onLoadException(LoadExceptionEvent<PagingLoadConfig> event) {
+    	        		MessageBox m = new MessageBox(event.getException().getMessage());
+    	          		m.setTitle("Error from PL server");
+    	          		m.show();
+    					resetProgress();
+    	    	  }
+    	      }
+    	    );
+    
     final PLRecordListView resultsDisplay = new PLRecordListView(
     		resultStore, 
     		this);
@@ -339,6 +350,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 					.searchSOLRForEvents(source, solrParams, new AsyncCallback<Map<String, List<FacetModel>>>() {
 
 						public void onFailure(Throwable t) {
+							System.out.println("Reached Client Side.");
 			        String details = t.getMessage();
 			        MessageBox m = new MessageBox(details);
 			        
@@ -362,8 +374,8 @@ public class ImageStats implements IsWidget, EntryPoint {
 							facetTree.expandAll();
 						}
 					});
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
 
 		searchBox.addKeyDownHandler(new KeyDownHandler(){
