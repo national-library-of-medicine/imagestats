@@ -22,6 +22,7 @@ import gov.nih.nlm.ceb.lpf.imagestats.shared.PLPagingLoadResultBean;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -45,6 +46,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.xml.client.NodeList;
 import com.sencha.gxt.cell.core.client.SimpleSafeHtmlCell;
 import com.sencha.gxt.cell.core.client.form.ComboBoxCell.TriggerAction;
 import com.sencha.gxt.core.client.ValueProvider;
@@ -256,6 +258,7 @@ public class ImageStats implements IsWidget, EntryPoint {
     resultsLoader.addLoadExceptionHandler(
     	      new LoadExceptionEvent.LoadExceptionHandler<PagingLoadConfig>() {
     	    	  public void onLoadException(LoadExceptionEvent<PagingLoadConfig> event) {
+    	    		  setCountsToZero();
     	        		MessageBox m = new MessageBox(event.getException().getMessage());
     	          		m.setTitle("Error from PL server");
     	          		m.show();
@@ -350,7 +353,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 					.searchSOLRForEvents(source, solrParams, new AsyncCallback<Map<String, List<FacetModel>>>() {
 
 						public void onFailure(Throwable t) {
-							System.out.println("Reached Client Side.");
+							setCountsToZero();
 			        String details = t.getMessage();
 			        MessageBox m = new MessageBox(details);
 			        
@@ -409,6 +412,21 @@ public class ImageStats implements IsWidget, EntryPoint {
 		return searchlayout;
 	}
 
+	void setCountsToZero(){
+		List<FacetModel> facetList = facetStore.getRootItems();
+		Iterator<FacetModel> it = facetList.iterator();
+		while(it.hasNext()){
+			Iterator<FacetModel> iter = facetStore.getAllChildren(it.next()).iterator();
+		while(iter.hasNext()){
+			FacetModel next = iter.next();
+			FacetModel parent = facetStore.getParent(next);
+			facetStore.remove(next);
+			next.setCount(0);
+			facetStore.add(parent, next);
+		}
+		}
+		facetTree.expandAll();
+	}
 /*	PLSolrParams buildFacetFilters(List<FacetModel> selected) {
 		PLSolrParams ret = new PLSolrParams();
 		Iterator<FacetModel> root_iter = facetTree.getStore().getRootItems().iterator();
