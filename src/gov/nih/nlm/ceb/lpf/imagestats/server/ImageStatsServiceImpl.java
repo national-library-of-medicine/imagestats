@@ -115,9 +115,18 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				
 			}
 */
+			
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
+		try{
+			InitialContext cxt = new InitialContext();
+	    	String source = (String)cxt.lookup("java:comp/env/repository/directory");
+	    }catch(NamingException e){throw new ServletException("Configuration Problem: Environment variable repository directory");}
+		try{
+	    	InitialContext ic = new InitialContext();
+	    	String virtualAddress = (String)ic.lookup("java:comp/env/repository/virtual");
+	    }catch(NamingException e){throw new ServletException("Configuration Problem: Environment variable Virtual Repository");}
 	}
 
 /*	
@@ -190,14 +199,12 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
-					try{
 					if(!searchBoxCriteria(SearchName, ImageName, Event))
 						continue;
-					}catch(Exception e){}
 					String mimetype="";
 					try{
 				        mimetype = Files.probeContentType(Paths.get(source+"/"+Event+"/"+ImageName));
-				    }catch(IOException e){System.out.println(e.getMessage());}
+				    }catch(IOException e){throw new ImageStatsException(e.getMessage());}
 				    String type = "";
 				    String subType = "";
 					if(mimetype!=null){
@@ -224,7 +231,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 						}catch(Exception e){}
 						
 					} catch (SQLException e) {
-						e.printStackTrace();
+						throw new ImageStatsException("Error created by PL Database");
 					}finally{
 							if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
 			        		if (st != null) try { st.close(); } catch (SQLException ignore) {}
@@ -427,7 +434,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 					String mimetype="";
 					try{
 				        mimetype = Files.probeContentType(Paths.get(sourceServer+"/"+Event+"/"+ImageName));
-				    }catch(IOException e){System.out.println(e.getMessage());}
+				    }catch(IOException e){throw new ImageStatsException(e.getMessage());}
 					String type = "";
 					String subType = "";
 					if(mimetype!=null){
@@ -472,38 +479,29 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 	}
 	
 	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory) throws ImageStatsException{
-		String[] tempSearchName = searchName.toLowerCase().split(":");
+		String[] tempSearchName = searchName.split(":");
 		
 		ImageName = ImageName.toLowerCase();
 		Directory = Directory.toLowerCase();
 		if(tempSearchName.length == 2){
 			
-			String field_name = tempSearchName[0].trim();
+			String field_name = tempSearchName[0].toLowerCase().trim();
 			String query_text = tempSearchName[1].trim();
 			if(query_text.equals("")){
 				//TODO Throw an error Query Text not correct.
 				throw new ImageStatsException("Query Text Empty");
 			}
-		if(field_name.equals("image_id")||field_name.equals("*")){
-			String[] searchArray = query_text.split(" ");
-			for(String s:searchArray)
-				if( matchStringsWithWildCards(s, Directory+"/"+ImageName))
-					return true;
-			return false;
+		if(field_name.equals("image_id")){
+			return matchStrings(query_text, Directory+"/"+ImageName);
 		}
 		else if(field_name.equals("image_name")){
-			String[] searchArray = query_text.split(" ");
-			for(String s:searchArray)
-				if( matchStringsWithWildCards(s, ImageName))
-					return true;
-			return false;
+			return matchStrings(query_text, ImageName);
 		}
 		else if(field_name.equals("collection")){
-			String[] searchArray = query_text.split(" ");
-			for(String s:searchArray)
-				if( matchStringsWithWildCards(s, Directory))
-					return true;
-			return false;
+			return matchStrings(query_text, Directory);
+		}
+		else if(field_name.equals("*")){
+			return matchStrings(query_text, Directory)||matchStrings(query_text, ImageName)||matchStrings(query_text, Directory+'/'+ImageName);
 		}
 		else{
 			//TODO Throw an error, field_name not valid.
@@ -519,11 +517,8 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				//TODO Throw an error Query Text not correct.
 				throw new ImageStatsException("Search Text Empty");
 			}
-			String[] searchArray = tempSearchName[0].trim().split(" ");
-			for(String s:searchArray)
-				if( matchStringsWithWildCards(s, Directory))
-					return true;
-			return false;
+			String query_text = tempSearchName[0];
+			return matchStrings(query_text, Directory)||matchStrings(query_text, ImageName)||matchStrings(query_text, Directory+'/'+ImageName);
 		}
 		else{
 			//TODO Throw an error.
@@ -531,6 +526,33 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 	
+	private boolean matchStrings(String s1, String s2){
+		String[] searchArray = s1.trim().split(" ");
+		
+		int i=0;
+		for(String s:searchArray){
+			if( s.equals("AND")){
+				String compared = "";
+				for(int j=0;j<i;j++){
+					compared = compared + " " + searchArray[j];
+				}
+				String remaining = "";
+				for(int j=i+1;j<searchArray.length;j++){
+					remaining = remaining + " " + searchArray[j];
+				}
+				return matchStrings(compared.trim(), s2)&&matchStrings(remaining.trim(), s2);
+			}
+			i++;
+		}
+		for(String s:searchArray){
+			if( !s.equals("OR")){
+				if(!s.equals(""))
+				if(matchStringsWithWildCards(s.toLowerCase(), s2))
+					return true;
+			}
+		}
+		return false;
+	}
 	private boolean matchStringsWithWildCards(String s1, String s2){
 		
 		String[] a = s1.split("\\*");
@@ -540,7 +562,8 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 					s2 = s2.substring(s2.indexOf(a[0]));
 				else
 					return false;
-			
+			else
+				s2 = "";
 		}
 		for(String s:a){
 			if(s2.startsWith(s))
@@ -554,6 +577,10 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 					s2 = s2.replaceFirst(s, "");
 			}
 		}
+		if(s1.charAt(s1.length()-1) == '*')
+			return true;
+		if(!s2.equals(""))
+			return false;
 		return true;
 	}
 	private List<PLRecord> sample(List<PLRecord> recordList, int start,
@@ -596,7 +623,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		return ret;
 	}
 	
-	PLRecord addPLRecord(String ImageUrl){
+	PLRecord addPLRecord(String ImageUrl) throws ImageStatsException{
 		PLRecord ret = new PLRecord();
 
 	    File imageFile = new File(ImageUrl);
@@ -635,7 +662,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 			}catch(Exception e){}
 			//System.out.println(ret.getGroundTruthStatus());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new ImageStatsException("Error created by PL Database");
 		}finally{
 				if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
         		if (st != null) try { st.close(); } catch (SQLException ignore) {}
@@ -661,7 +688,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		String mimetype="";
 		try{
 	        mimetype = Files.probeContentType(Paths.get(ImageUrl));
-	    }catch(IOException e){System.out.println(e.getMessage());}
+	    }catch(IOException e){throw new ImageStatsException(e.getMessage());}
 		String subType = "";
 		if(mimetype!=null){
 			subType = mimetype.split("/")[1];
@@ -1034,7 +1061,22 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 			if(authorName == null || authorName.trim().length() == 0) {
 				authorName = "unauthenticated";
 			}
+			GroundTruthRecord previous = imageStatsDB.getGroundTruthRecordWithId(image_id);
+			if(previous!=null){
+			ImageRegionModel[] previousRegions = previous.get_final_regions();
+			boolean flag = true;
+			if(previousRegions.length == regions.length)
+				flag = false;
+			else{
+				int i=0;
+			for(ImageRegionModel irm: previousRegions){
+				if(!previousRegions[i].equals(regions[i]))
+					flag = false;
+			}
+			}
+			if(flag == true)
 		  imageStatsDB.saveRegions(image_id, authorName, groundTruthStatus, regions);
+			}
 		}
 		catch (SQLException sqle) {
 			ImageStatsException ise = new ImageStatsException(sqle.getMessage());
