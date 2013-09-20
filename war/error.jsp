@@ -21,18 +21,18 @@
 <body bgcolor="white">
 <table><tbody valign="bottom"><tr>
 <td id="header" align="left">
-  <a href="https://pl.nlm.nih.gov/">
-    <img id="leftHeaderLogoImg" src="https://pl.nlm.nih.gov/theme/lpf3/img/pl.png" alt="People Locator Logo">
+  <a href="http://www.nlm.nih.gov/">
+    <img id="LeftHeaderLogoImg" src="https://pl.nlm.nih.gov/theme/lpf3/img/NLMlogoSmall.gif" alt="United States National Library of Medicine Logo">
   </a>
 </td>
 <td id="headerText" style="text-align: left">
-			<span class="{style.homeBanner}">ImageStats</span><br/>
+			<span class="homeBanner">ImageStats</span><br/>
 			<span>U.S. National Library of Medicine</span><br/>
 			<span>Lister Hill National Center for Biomedical Communications</span>
 </td>
 <td align="right" valign="top">
-  <a href="http://www.nlm.nih.gov/">
-    <img src="https://pl.nlm.nih.gov/theme/lpf3/img/NLMlogoSmall.gif" alt="United States National Library of Medicine Logo">
+  <a href="https://sahanafoundation.org/">
+    <img id="RightHeaderLogoImg" src="http://sahanafoundation.org/wp-content/uploads/2011/05/sahanalogo.jpg" alt="Sahana Logo">
   </a>
 </td>
 </tr>
