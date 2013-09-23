@@ -142,6 +142,9 @@ import com.google.gwt.resources.client.CssResource;
 				source.setFillOpacity(0.2);
 				int x = event.getX();
 				int y = event.getY();
+				if(y >=((AnnotationBox)(event.getSource())).getHeight() &&x >= ((AnnotationBox)(event.getSource())).getWidth()){
+					source.getElement().getStyle().setCursor(Cursor.NE_RESIZE);
+				}
 				if(y >=((AnnotationBox)(event.getSource())).getHeight()){
 					source.getElement().getStyle().setCursor(Cursor.N_RESIZE);
 				}
