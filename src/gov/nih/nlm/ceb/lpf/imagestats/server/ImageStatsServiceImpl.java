@@ -199,8 +199,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				if(Images == null)
 					Images = new String[0];
 				for(String ImageName:Images){
-					if(!searchBoxCriteria(SearchName, ImageName, Event))
-						continue;
+					
 					String mimetype="";
 					try{
 				        mimetype = Files.probeContentType(Paths.get(source+"/"+Event+"/"+ImageName));
@@ -211,7 +210,8 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				        type = mimetype.split("/")[0];
 				        subType = mimetype.split("/")[1];
 					}
-					
+					if(!searchBoxCriteria(SearchName, ImageName, Event, subType))
+						continue;
 					
 				    
 					Connection con = null;
@@ -426,8 +426,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 					Images = new String[0];
 				for(String ImageName:Images){
 				
-					if(!searchBoxCriteria(SearchName, ImageName, Event))
-						continue;
+
 					
 					//if(SearchName.contains(ImageName));
 					//System.out.println(ImageName);
@@ -441,7 +440,8 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 						type = mimetype.split("/")[0];
 						subType = mimetype.split("/")[1];
 					}
-					
+					if(!searchBoxCriteria(SearchName, ImageName, Event, subType))
+						continue;
 					
 				    if(type!=null&&type.equals("image")){
 				    	boolean checkType = isParamSelected(subType, TypeParams);
@@ -478,11 +478,16 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		return retpaging;
 	}
 	
-	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory) throws ImageStatsException{
+	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory, String type) throws ImageStatsException{
 		String[] tempSearchName = searchName.split(":");
 		
 		ImageName = ImageName.toLowerCase();
 		Directory = Directory.toLowerCase();
+		String nameWithoutExt = "";
+		try{
+		if(ImageName.contains("."))
+			nameWithoutExt = ImageName.substring(0,(ImageName.lastIndexOf(".", ImageName.length()-1)));
+		}catch(Exception e){}
 		if(tempSearchName.length == 2){
 			
 			String field_name = tempSearchName[0].toLowerCase().trim();
@@ -492,16 +497,16 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				throw new ImageStatsException("Query Text Empty");
 			}
 		if(field_name.equals("image_id")){
-			return matchStrings(query_text, Directory+"/"+ImageName);
+			return matchStrings(query_text, Directory+"/"+ImageName)||matchStrings(query_text, Directory+"/"+nameWithoutExt);
 		}
 		else if(field_name.equals("image_name")){
-			return matchStrings(query_text, ImageName);
+			return matchStrings(query_text, ImageName)||matchStrings(query_text, nameWithoutExt);
 		}
 		else if(field_name.equals("collection")){
 			return matchStrings(query_text, Directory);
 		}
 		else if(field_name.equals("*")){
-			return matchStrings(query_text, Directory)||matchStrings(query_text, ImageName)||matchStrings(query_text, Directory+'/'+ImageName);
+			return matchStrings(query_text, Directory)||matchStrings(query_text, ImageName)||matchStrings(query_text, Directory+'/'+ImageName)||matchStrings(query_text, nameWithoutExt)||matchStrings(query_text, Directory+'/'+nameWithoutExt);
 		}
 		else{
 			//TODO Throw an error, field_name not valid.
@@ -518,7 +523,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				throw new ImageStatsException("Search Text Empty");
 			}
 			String query_text = tempSearchName[0];
-			return matchStrings(query_text, Directory)||matchStrings(query_text, ImageName)||matchStrings(query_text, Directory+'/'+ImageName);
+			return matchStrings(query_text, Directory)||matchStrings(query_text, ImageName)||matchStrings(query_text, Directory+'/'+ImageName)||matchStrings(query_text, nameWithoutExt)||matchStrings(query_text, Directory+'/'+nameWithoutExt);
 		}
 		else{
 			//TODO Throw an error.
@@ -1063,21 +1068,29 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 			}
 			GroundTruthRecord previous = imageStatsDB.getGroundTruthRecordWithId(image_id);
 			if(previous!=null){
+				if((regions==null || regions.length==0))
+					return;
 			ImageRegionModel[] previousRegions = previous.get_final_regions();
 			boolean flag = true;
-			if(previousRegions.length == regions.length)
+			if(previousRegions.length != regions.length)
 				flag = false;
 			else{
 				int i=0;
 			for(ImageRegionModel irm: previousRegions){
-				if(!previousRegions[i].equals(regions[i]))
+				if(!previousRegions[i].isEqual(regions[i]))
 					flag = false;
+				i++;
 			}
 			}
-			if(flag == true)
+			if(flag == false)
 		  imageStatsDB.saveRegions(image_id, authorName, groundTruthStatus, regions);
 			}
+			else{
+				if(!(regions==null || regions.length==0))
+					imageStatsDB.saveRegions(image_id, authorName, groundTruthStatus, regions);
+			}
 		}
+		
 		catch (SQLException sqle) {
 			ImageStatsException ise = new ImageStatsException(sqle.getMessage());
 			ise.setStackTrace(sqle.getStackTrace());
