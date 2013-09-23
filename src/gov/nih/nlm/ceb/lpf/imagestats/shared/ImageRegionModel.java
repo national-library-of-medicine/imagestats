@@ -41,7 +41,11 @@ public class ImageRegionModel implements Serializable {
 
 	}
 	
-	
+	public boolean isEqual(ImageRegionModel irm){
+		if(x==irm.x&&y==irm.y&&width==irm.width&&height==irm.height&&type.equals(irm.type))
+			return true;
+		return false;
+	}
 	public ImageRegionModel(String t, int X, int Y, int W, int H) {
 		type = t;
 		x = X;

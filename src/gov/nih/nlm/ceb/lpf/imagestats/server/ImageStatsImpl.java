@@ -541,80 +541,27 @@ UserRoleDB userroles = null;
 	}
 	
 	void exportGroundTruthData(String sourceServer, JsonObject plResults, HttpServletRequest request, final HttpServletResponse resp, final boolean isFinal) throws IOException {
-    final String cvs_fs = "\t";
-    final String cvs_rs = "\n";
-    String outputfile = defaultUsers;
-    if(plResults == null){
-		JsonArray resultSet = plResults.getAsJsonObject("response").getAsJsonArray("docs");
-		Iterator<JsonElement> iter = resultSet.iterator();
-		if(iter.hasNext()) {
-			JsonObject el = iter.next().getAsJsonObject();
-			PLRecord rec = Utils.parseJsonDoc(sourceServer, el);
-			outputfile = rec.getEventShortName() + ".tsv";
-			//resp.addHeader("Content-Disposition", "attachment; filename=\"imagestats."+outputfile+"\"");
-			
-			iter = resultSet.iterator();
-		}
-		while (iter.hasNext()) {
+	    String cvs_fs = "\t";
+	    String cvs_rs = "\n";
+	    String outputfile = defaultUsers;
+			JsonArray resultSet = plResults.getAsJsonObject("response").getAsJsonArray("docs");
+			Iterator<JsonElement> iter = resultSet.iterator();
+			if(iter.hasNext()) {
 				JsonObject el = iter.next().getAsJsonObject();
 				PLRecord rec = Utils.parseJsonDoc(sourceServer, el);
-				writeFieldsCSV(resp.getWriter(), rec.getGTColumns(isFinal), cvs_fs,
-						cvs_rs);
+				outputfile = rec.getEventShortName() + ".tsv";
+				//resp.addHeader("Content-Disposition", "attachment; filename=\"imagestats."+outputfile+"\"");
+
+				iter = resultSet.iterator();
+			}
+			while (iter.hasNext()) {
+					JsonObject el = iter.next().getAsJsonObject();
+					PLRecord rec = Utils.parseJsonDoc(sourceServer, el);
+					writeFieldsCSV(resp.getWriter(), rec.getGTColumns(isFinal), cvs_fs,
+							cvs_rs);
+			}
+			//resp.addHeader("Content-Disposition", "attachment; filename=\"imagestats."+outputfile+"\"");
 		}
-    }
-    else{
-    	PLSolrParams searchparams = null;
-
-		PLSolrParams urlparams = new PLSolrParams();
-		urlparams.add("qt", "edismax");
-		urlparams.add("wt", "json");
-	  urlparams.add("sort", "created desc");
-		urlparams.add("fq", "url_thumb:[* TO *]");
-	  addUserEventFilter(urlparams, Utils.getUser(request));
-		
-//	  urlparams.add("sort", "expiry_date desc");
-	  Enumeration<String> en = (Enumeration<String>) request.getParameterNames();
-	  while(en.hasMoreElements()) {
-	  	String n = en.nextElement();
-	  	String [] vals = request.getParameterValues(n);
-	  	urlparams.add(n, vals);
-	  }
-    	
-    	
-    	
-    	//PLPagingLoadResultBean results = searchSOLRForPaging("", searchparams);
-    	imageStatsService
-		.searchSOLRForPaging("", searchparams, new AsyncCallback<PLPagingLoadResultBean>() {
-
-			public void onFailure(Throwable t) {
-        String details = t.getMessage();
-        MessageBox m = new MessageBox(details);
-        
-        if (t instanceof ImageStatsException) {
-          m.setMessage(((ImageStatsException)t).getISMessage());
-        }
-      m.show();
-			}
-
-			public void onSuccess(PLPagingLoadResultBean eventList) {
-				if(eventList!=null){
-					ArrayList<PLRecord> RecordList = (ArrayList<PLRecord>)eventList.getData();
-					Iterator<PLRecord> iter = RecordList.iterator();
-				while (iter.hasNext()) {
-						PLRecord rec = iter.next();
-						try{
-							writeFieldsCSV(resp.getWriter(), rec.getGTColumns(isFinal), cvs_fs,
-								cvs_rs);
-						}catch(Exception e){MessageBox m = new MessageBox(e.getMessage());
-											m.setMessage("Error Fetching Data");
-											m.show();}
-				}
-				}
-			}
-		});
-    }
-		//resp.addHeader("Content-Disposition", "attachment; filename=\"imagestats."+outputfile+"\"");
-	}
 
 	void exportGroundTruthData(String solrServer, String [] imageUrls, HttpServletRequest request,  HttpServletResponse resp, boolean isFinal) throws IOException {
 		//exportGroundTruthData(solrServer, pl.searchWithUrls(solrServer, imageUrls),resp, isFinal);
