@@ -210,7 +210,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 				        type = mimetype.split("/")[0];
 				        subType = mimetype.split("/")[1];
 					}
-					if(!searchBoxCriteria(SearchName, ImageName, Event, subType))
+					if(!searchBoxCriteria(SearchName, ImageName, Event))
 						continue;
 					
 				    
@@ -440,7 +440,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 						type = mimetype.split("/")[0];
 						subType = mimetype.split("/")[1];
 					}
-					if(!searchBoxCriteria(SearchName, ImageName, Event, subType))
+					if(!searchBoxCriteria(SearchName, ImageName, Event))
 						continue;
 					
 				    if(type!=null&&type.equals("image")){
@@ -478,7 +478,7 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		return retpaging;
 	}
 	
-	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory, String type) throws ImageStatsException{
+	private boolean searchBoxCriteria(String searchName, String ImageName, String Directory) throws ImageStatsException{
 		String[] tempSearchName = searchName.split(":");
 		
 		ImageName = ImageName.toLowerCase();
@@ -487,6 +487,8 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 		try{
 		if(ImageName.contains("."))
 			nameWithoutExt = ImageName.substring(0,(ImageName.lastIndexOf(".", ImageName.length()-1)));
+		else
+			nameWithoutExt = ImageName;
 		}catch(Exception e){}
 		if(tempSearchName.length == 2){
 			
@@ -560,33 +562,83 @@ public class ImageStatsServiceImpl extends RemoteServiceServlet implements
 	}
 	private boolean matchStringsWithWildCards(String s1, String s2){
 		
+		if(s1.length()==0)
+			if(s2.length()==0) return true;
+			else return false;
+		else if(s1.length()==1){
+			if(s1.charAt(0)=='*')
+				return true;
+			else{
+				if(s2.length()==1 && s1.charAt(0) == s2.charAt(0)) return true;
+				else return false;
+			}
+		}
+		else{
+			if(s1.charAt(0)=='*'){
+				String temp = s1.substring(1);
+				if(s2.length()==0)
+					return false;
+				return(matchStringsWithWildCards(temp, s2)||matchStringsWithWildCards(s1, s2.substring(1)));
+			}
+			else{
+				if(s2.length()==0)
+					return false;
+				else{
+					if(s1.charAt(0)==s2.charAt(0))
+						return matchStringsWithWildCards(s1.substring(1), s2.substring(1));
+					else return false;
+				}
+			}
+		}/*
 		String[] a = s1.split("\\*");
+		ArrayList<String> arl = new ArrayList<String>();
 		if(s1.charAt(0)=='*'){
-			if(a.length>0)
-				if(s2.contains(a[0]))
-					s2 = s2.substring(s2.indexOf(a[0]));
+			if(a.length>1)
+				if(s2.contains(a[1])){
+					while(s2.contains(a[1])){
+						s2 = s2.substring(s2.indexOf(a[1]));
+						arl.add(s2);
+						s2 = s2.substring(a[1].length());
+					}
+					
+				}
 				else
 					return false;
 			else
-				s2 = "";
+				return true;
 		}
+		else arl.add(s2);
+		outer:
+		for(String s3:arl){
+		if(a.length>=1){
+			if(s3.startsWith(a[0]))
+				s3 = s3.replaceFirst(a[0], "");
+			else
+				continue;
+		}
+		else continue;
+		int count =0;
 		for(String s:a){
-			if(s2.startsWith(s))
-				s2 = s2.replaceFirst(s, "");
+			if (count==0) continue;
+			if(s3.startsWith(s))
+				s3 = s3.replaceFirst(s, "");
 			else{
-				while((!s2.equals("")) && (!s2.startsWith(s)))
-					s2 = s2.substring(1,s2.length());
+				while((!s3.equals("")) && (!s3.startsWith(s)))
+					s3 = s3.substring(1,s3.length());
 				if(s2.equals(""))
-					return false;
+					continue outer;
 				else
-					s2 = s2.replaceFirst(s, "");
+					s3 = s3.replaceFirst(s, "");
 			}
+			count++;
 		}
 		if(s1.charAt(s1.length()-1) == '*')
 			return true;
-		if(!s2.equals(""))
-			return false;
+		if(!s3.equals(""))
+			continue;
 		return true;
+		}
+		return false;*/
 	}
 	private List<PLRecord> sample(List<PLRecord> recordList, int start,
 			int row) {
