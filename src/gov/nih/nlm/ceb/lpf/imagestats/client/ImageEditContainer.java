@@ -75,10 +75,9 @@ IsWidget {
   private TextButton nextButton = null;
   private TextButton prevButton = null;
   
-  private Radio iradio = null;
-  private Radio nradio = null;
-  private Radio eradio = null;
-  private Radio mradio = null;
+  private Radio fradio = null;
+  private Radio pradio = null;
+  private Radio sradio = null;
   private Radio aradio = null;
   ToggleGroup toggle = new ToggleGroup();
   ScrollPanel container = new ScrollPanel();
@@ -233,25 +232,22 @@ IsWidget {
     }), vBoxData);
  
 
-    mradio = new Radio();
-    mradio.setBoxLabel("<span style=\"background-color: yellow\">Mouth</span>");
-    mradio.setName(ImageRegionModel.MOUTH);
-    mradio.setToolTip("Yellow boxes");
+    fradio = new Radio();
+    fradio.setBoxLabel("<span style=\"background-color: yellow\">face</span>");
+    fradio.setName(ImageRegionModel.FACE);
+    //fradio.setValue(true);
+    fradio.setToolTip("Yellow boxes");
+		//typeHolder.setValue(fradio.getName()); 
  
-    nradio = new Radio();
-    nradio.setBoxLabel("<span style=\"background-color: green; color: white\">Nose</span>");
-    nradio.setName(ImageRegionModel.NOSE);
-    nradio.setToolTip("Green boxes");
- 
-    iradio = new Radio();
-    iradio.setBoxLabel("<span style=\"background-color: red; color: white\">Eye</span>");
-    iradio.setName(ImageRegionModel.EYE);
-    iradio.setToolTip("Red boxes");
- 
-    eradio = new Radio();
-    eradio.setBoxLabel("<span style=\"background-color: purple; color: white\">Ear</span>");
-    eradio.setName(ImageRegionModel.EAR);
-    eradio.setToolTip("Purple boxes");
+    pradio = new Radio();
+    pradio.setBoxLabel("<span style=\"background-color: red; color: white\">profile</span>");
+    pradio.setName(ImageRegionModel.PROFILE);
+    pradio.setToolTip("Red boxes");
+    sradio = new Radio();
+    //sradio.setStyleName(style.);
+    sradio.setBoxLabel("<span style=\"background-color: cyan\">skin</span>");
+    sradio.setName(ImageRegionModel.SKIN);
+    sradio.setToolTip("Cyan boxes");
  
     aradio = new Radio();
     aradio.setBoxLabel("show all");
@@ -259,19 +255,17 @@ IsWidget {
     aradio.setToolTip("Show all boxes.");
  
     HorizontalPanel hp = new HorizontalPanel();
-    hp.add(mradio);
-    hp.add(nradio);
-    hp.add(iradio);
-    hp.add(eradio);
+    hp.add(fradio);
+    hp.add(pradio);
+    hp.add(sradio);
     hp.add(aradio);
  
     optionsBar.add(new FieldLabel(hp, "Mode"));
  
     // we can set name on radios or use toggle group
-    toggle.add(mradio);
-    toggle.add(nradio);
-    toggle.add(iradio);
-    toggle.add(eradio);
+    toggle.add(fradio);
+    toggle.add(pradio);
+    toggle.add(sradio);
     toggle.add(aradio);
 
     toggle.addValueChangeHandler(new ValueChangeHandler<HasValue<Boolean>>() {
@@ -285,16 +279,17 @@ IsWidget {
       }
     });
     
-    toggle.setValue(mradio);
+    toggle.setValue(fradio);
     prevButton = createButton("Previous", new SelectHandler() {
 			@Override
 			public void onSelect(SelectEvent event) {
 				ListView<PLRecord, PLRecord> view = resultsView.getListView();
 				if(cellContext.getIndex() > 0) {
-				  authorTypeHolder.setValue(false, false);
-				  saveEditsToDB();
+					authorTypeHolder.setValue(true, false);
+					  saveEditsToDB();
 				  XElement el = view.getElement(cellContext.getIndex() - 1);
 				  fireDblClick(el);
+				  
 				}
 				/*
 				else {
@@ -312,8 +307,8 @@ IsWidget {
 			public void onSelect(SelectEvent event) {
 				ListView<PLRecord, PLRecord> view = resultsView.getListView();
 				if(cellContext.getIndex() < (view.getItemCount() - 1)) {
-				  authorTypeHolder.setValue(false, false);
-				  saveEditsToDB();
+					authorTypeHolder.setValue(true, false);
+					  saveEditsToDB();
 				  XElement el = view.getElement(cellContext.getIndex() + 1);
 				  fireDblClick(el);
 				}
@@ -373,6 +368,20 @@ IsWidget {
   		resetEdits(false);
   	}
   	enablePrevNextButtons();
+    if(imageDetailsRecord.getEventShortName().matches(".*skin.*")) {
+    	//restoreFaceFinderButton.disable();
+    	//sradio.setValue(true);
+    	toggle.setValue(sradio);
+    	//fradio.setValue(false);
+    	typeHolder.setValue(sradio.getName());
+    }
+    else {
+    	//restoreFaceFinderButton.enable();
+    	//fradio.setValue(true);
+    	toggle.setValue(fradio);
+    	//sradio.setValue(false);
+    	typeHolder.setValue(fradio.getName());
+    }
   	
     lccenter.clear();
     lccenter.add(canvas);
@@ -495,6 +504,17 @@ IsWidget {
     		restoreInitialButton.enable();
     	}
     }
+    
+    // Disable skin annotations for black and white pictures. 
+    if(imageDetailsRecord.getColorChannels() < 3) {
+    	sradio.setValue(false); // If set, reset skin radio button
+    	sradio.disable(); 
+    	MessageBox m = new MessageBox("No skin annotations are required on this pictures");
+      m.show();
+    }
+    else {
+    	sradio.enable();
+    }
   }
   
   void addDBBoxes(String image_id) {
@@ -552,11 +572,7 @@ IsWidget {
 		for (ImageRegionModel region : models) {
 			if (region.getType().equals(ImageRegionModel.FACE)
 					|| region.getType().equals(ImageRegionModel.PROFILE)
-					|| region.getType().equals(ImageRegionModel.SKIN)
-					|| region.getType().equals(ImageRegionModel.MOUTH)
-					|| region.getType().equals(ImageRegionModel.NOSE)
-					|| region.getType().equals(ImageRegionModel.EYE)
-					|| region.getType().equals(ImageRegionModel.EAR)) {
+					|| region.getType().equals(ImageRegionModel.SKIN)) {
 				AnnotationBox box = new AnnotationBox(
 						(new BigDecimal(region.getX()).divide(nFactor, 4,
 								RoundingMode.HALF_UP)).intValue(),
@@ -568,17 +584,12 @@ IsWidget {
 								RoundingMode.HALF_UP)).intValue(), region.getType());
 				box.setFillOpacity(0);
 				box.setStrokeWidth(1);
-				if (region.getType().equals(ImageRegionModel.FACE)||
-						region.getType().equals(ImageRegionModel.MOUTH)) {
+				if (region.getType().equals(ImageRegionModel.FACE)) {
 					box.setStrokeColor("yellow");
-				} else if (region.getType().equals(ImageRegionModel.PROFILE)||
-						region.getType().equals(ImageRegionModel.EYE)) {
+				} else if (region.getType().equals(ImageRegionModel.PROFILE)) {
 					box.setStrokeColor("red");
-				} else if (region.getType().equals(ImageRegionModel.SKIN)||
-						region.getType().equals(ImageRegionModel.NOSE)) {
-					box.setStrokeColor("green");
-				} else if (region.getType().equals(ImageRegionModel.EAR)) {
-					box.setStrokeColor("purple");
+				} else if (region.getType().equals(ImageRegionModel.SKIN)) {
+					box.setStrokeColor("cyan");
 				} else {
 					continue;
 				}
@@ -623,19 +634,16 @@ IsWidget {
   	for(int i = 0; canvas != null && i < canvas.getVectorObjectCount(); i++) {
   		VectorObject vo = canvas.getVectorObject(i);
   		if(vo instanceof AnnotationBox) {
-  		    String type = ImageRegionModel.MOUTH;
+  			String type = ImageRegionModel.FACE;
   			String color = ((AnnotationBox) vo).getStrokeColor();
-  			if(color.equalsIgnoreCase("yellow")) {
-  				type = ImageRegionModel.MOUTH;
+  			if(color.equalsIgnoreCase("red")) {
+  				type = ImageRegionModel.PROFILE;
   			}
-  			else if(color.equalsIgnoreCase("red")) {
-  				type = ImageRegionModel.EYE;
+  			else if(color.equalsIgnoreCase("yellow")) {
+  				type = ImageRegionModel.FACE;
   			}
-  			else if(color.equalsIgnoreCase("green")) {
-  				type = ImageRegionModel.NOSE;
-  			}
-  			else if(color.equalsIgnoreCase("purple")) {
-  				type = ImageRegionModel.EAR;
+  			else if(color.equalsIgnoreCase("cyan")) {
+  				type = ImageRegionModel.SKIN;
   			}
   			ImageRegionModel sm = 
   					new ImageRegionModel(type, 

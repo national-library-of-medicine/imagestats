@@ -525,7 +525,6 @@ public class PLRecordListView implements
         PLRecord record = view.getSelectionModel().getSelectedItem();
         if (record != null) {
           if (editDialog.getHideButton() == editDialog.getButtonById(PredefinedButton.CLOSE.name())) {
-        	  imageEdit.saveEditsToDB();
           	//editDialog.getParent().fireEvent(GwtEvent<EventHandler>.Type);
           }
         }

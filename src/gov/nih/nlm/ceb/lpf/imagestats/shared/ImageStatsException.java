@@ -5,7 +5,7 @@ public class ImageStatsException extends Exception implements java.io.Serializab
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
 
 	String localMessage = null;
 	public ImageStatsException() {
@@ -22,7 +22,8 @@ public class ImageStatsException extends Exception implements java.io.Serializab
 		return localMessage;
 	}
 	
-	public String getMessage(){
+	public String getMessage() {
 		return localMessage;
 	}
+	
 }
