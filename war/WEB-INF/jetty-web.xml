@@ -20,7 +20,7 @@ http://jetty.mortbay.org/configure.dtd">
     <Arg>
       <New class="org.apache.commons.dbcp.BasicDataSource">
         <Set name="driverClassName">org.sqlite.JDBC</Set>
-        <Set name="Url">jdbc:sqlite:/C:/Users/akanduru/mohit_work/imagestat/war/PLDB.db</Set>
+        <Set name="Url">jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/PLDB.db</Set>
         <Set name="Username"></Set>
         <Set name="Password"></Set>
       </New>
@@ -110,7 +110,7 @@ http://jetty.mortbay.org/configure.dtd">
 <New class="org.mortbay.jetty.plus.naming.EnvEntry">
   <Arg></Arg>
   <Arg>java:/comp/env/repository/directory</Arg>
-  <Arg type="java.lang.String">C:/Users/akanduru/repo</Arg>
+  <Arg type="java.lang.String">E:/Photos</Arg>
   <Arg type="boolean">true</Arg>
 </New>
  <New id="MyEnvEntry2" class="org.mortbay.jetty.plus.naming.EnvEntry">
