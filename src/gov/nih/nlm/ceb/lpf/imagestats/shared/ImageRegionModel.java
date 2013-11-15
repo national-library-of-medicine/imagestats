@@ -13,6 +13,10 @@ public class ImageRegionModel implements Serializable {
 	public static final String FACE = "f";
 	public static final String PROFILE = "p";
 	public static final String SKIN = "s";
+	public static final String EYE = "i";
+	public static final String EAR = "e";
+	public static final String NOSE = "n";
+	public static final String MOUTH = "m";
 
 	//public static Pattern pat = Pattern.compile("^\\s*([a-zA-Z]+)\\[(\\d+),(\\d+);(\\d+),(\\d+)\\]\\s*$");
 
@@ -20,7 +24,8 @@ public class ImageRegionModel implements Serializable {
 	int y = -1;
 	int width = 0;
 	int height = 0;
-	String type = FACE;
+	//String type = FACE;
+	String type = EYE;
 	
 	/*
 	public ImageRegionModel(String regionSpec) {

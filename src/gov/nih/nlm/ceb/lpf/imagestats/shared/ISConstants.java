@@ -78,7 +78,7 @@ public interface ISConstants extends Serializable {
 	public final static String GROUNDTRUTH_STATUS_ONE = "1";
 	public final static String GROUNDTRUTH_STATUS_TWO = "2";
 	public final static String GROUNDTRUTH_STATUS_THREE = "3";
-	public final static String GROUNDTRUTH_STATUS_NOT_DONE = "Not Done(Light Gray)";
+	public final static String GROUNDTRUTH_STATUS_NOT_DONE = "Not Done";
 	public final static String GROUNDTRUTH_STATUS_FM_SAVED = "Saved from FaceMatcher(Yellow)";
 	public final static String GROUNDTRUTH_STATUS_INITIAL_DONE = "Initiated(Yellow)";
 	public final static String GROUNDTRUTH_STATUS_FINAL_DONE = "Completed(Green)";

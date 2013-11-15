@@ -74,13 +74,13 @@ import com.sencha.gxt.widget.core.client.box.MessageBox;
 @SuppressWarnings("serial")
 public class ImageStatsImpl extends HttpServlet {
 //	SearchPL pl_ws = null;
-	//SearchPLUsingSOLR pl = null;
+	SearchFileSystem pl = null;
 
 	String defaultUsers = null;
 	//DataSource plstageDataSource = null;
 
-	private final ImageStatsServiceAsync imageStatsService = GWT
-			.create(ImageStatsService.class);
+//	private final ImageStatsServiceAsync imageStatsService = GWT
+//			.create(ImageStatsService.class);
 	
 UserRoleDB userroles = null;
 
@@ -111,13 +111,12 @@ UserRoleDB userroles = null;
 		//pl_ws.init();
 		try {
 		  //pl = new SearchPLUsingSOLR();
-			/*InitialContext cxt = new InitialContext();
+			InitialContext cxt = new InitialContext();
 			DataSource plDataSource = (DataSource) cxt.lookup( "java:/comp/env/jdbc/pl" );
 			imageStatsDB = new ImageStatsDB(plDataSource);
 			DataSource usersDataSource = (DataSource) cxt.lookup( "java:/comp/env/jdbc/users" );
-			userDB = new UserRoleDB(usersDataSource);*/
-			imageStatsDB = null;
-			userDB = null;
+			userDB = new UserRoleDB(usersDataSource);
+			//pl = new SearchFileSystem(imageStatsDB);
 			//pl.setUserDB(userDB);
 
 			try {
@@ -161,7 +160,7 @@ UserRoleDB userroles = null;
 		String[] imageUrls = request.getParameterValues("url");
 		JsonObject plResults = null;
 		if(imageUrls == null) {
-			//plResults = pl.searchForImages(sourceUrl, request);
+			plResults = pl.searchForImages(sourceUrl, request);
 		}
 		
 		String format = request.getParameter("format");
@@ -178,9 +177,6 @@ UserRoleDB userroles = null;
 		if(disposition != null && disposition.equalsIgnoreCase("true")) {
 			if(ISConstants.INITIAL_FORMAT_GROUNDTRUTH_CSV.equalsIgnoreCase(format) ||
 					ISConstants.FINAL_FORMAT_GROUNDTRUTH_CSV.equalsIgnoreCase(format)) {
-				//TODO - Kludge for google students application. Use filename based on user name.
-	      //response.setContentType("text/plain");
-	      //response.setCharacterEncoding("UTF-8");
 				response.addHeader("Content-Disposition", "attachment; filename=\"imagestats."+Utils.getUser(request)+".tsv\"");
 			}
 			else {
@@ -195,28 +191,10 @@ UserRoleDB userroles = null;
 					String [] columns = getImageStats(imageUrls[i]);
 					writeFieldsCSV(response.getWriter(), columns, csv_fs, csv_rs);
 			  }
-			}/*
-			else {
-				IplImageStatsList statsList = getImageStatsList(sourceUrl, plResults);
-				if(statsList != null) {
-					List<IplImageStats> list = statsList.getIplImageSet();
-					if(list != null) {
-				    Iterator<IplImageStats> iter = list.iterator();
-				    while(iter.hasNext()) {
-					    String [] columns = getImageStats(iter.next().getImageUrl());
-					    writeFieldsCSV(response.getWriter(), columns, csv_fs, csv_rs);
-				    }
-				  }
-				}
-			}*/
+			}
       response.setContentType("text/plain");
       response.setCharacterEncoding("UTF-8");
-		}/*
-		else if(ISConstants.FORMAT_JSON.equalsIgnoreCase(format)) {
-			IplImageStatsList statsList = getImageStatsList(sourceUrl, plResults);
-			Gson gson = new Gson();
-			gson.toJson(statsList, response.getWriter());
-		}*/
+		}
 		else if(ISConstants.FORMAT_ZIP.equalsIgnoreCase(format)) {
 			if(imageUrls != null && imageUrls.length > 0) {
 			  ZipImages(sourceUrl, imageUrls, response.getOutputStream());
@@ -241,13 +219,6 @@ UserRoleDB userroles = null;
 				DocumentBuilder builder = factory.newDocumentBuilder();
 				org.w3c.dom.Document domDoc = builder.newDocument();
 
-				/*org.w3c.dom.Element root = domDoc.createElement("IplImageSet");
-				domDoc.appendChild(root);
-				for (int i = 0; imageUrls != null && i < imageUrls.length; i++) {
-						Element iplImageEl = getImageStatsDOM(domDoc, imageUrls[i]);
-						iplImageEl.setAttribute("url", imageUrls[i]);
-						root.appendChild(iplImageEl);
-				}*/
         response.setContentType("text/xml");
         response.setCharacterEncoding("UTF-8");
 				response.getWriter().write(toXMLString(domDoc));
@@ -257,43 +228,6 @@ UserRoleDB userroles = null;
 			}
 		}
 	}
- /*
-	public IplImageStatsList getImageStatsList(String sourceServer, JsonObject plResults) throws IOException{
-		// Verify that the input is valid.
-		IplImageStatsList ret = new IplImageStatsList();
-		try {
-			JsonArray resultSet = plResults.getAsJsonObject("response").getAsJsonArray("docs");
-			ret.setCount(plResults.getAsJsonObject("response").get("numFound").getAsInt());
-			Iterator<JsonElement> iter = resultSet.iterator();
-			while(iter.hasNext()) {
-				JsonObject el = iter.next().getAsJsonObject();
-				String str = el.get("url").getAsString();
-				if(str != null && str.length() > 0) {
-			    URL u = new URL(Utils.prefixServer(sourceServer, str));
-			    IplImage iplImage = getIplImage(u);
-			    ret.add(new IplImageStats(u.toString(), iplImage));
-				}
-			}
-		} catch (MalformedURLException mfue) {
-
-		}
-
-		return ret;
-	}
-*/
-	/*public Element getImageStatsDOM(Document domDoc, String urlStr) throws IOException{
-		// Verify that the input is valid.
-		Element ret = null;
-		try {
-			URL u = new URL(urlStr);
-			IplImage iplImage = getIplImage(u);
-			ret = toDOMElement(domDoc, iplImage);
-		} catch (MalformedURLException mfue) {
-
-		}
-
-		return ret;
-	}*/
 
 	public String[] getImageStats(String urlStr)
 			throws MalformedURLException, IOException {
@@ -301,17 +235,6 @@ UserRoleDB userroles = null;
 		String[] ret = new String[]{urlStr};
 		
 		URL u = new URL(urlStr);
-		/*IplImage iplImage = getIplImage(u);
-		Integer[] dataElements = getIntegerMembers(iplImage);
-		if (dataElements != null) {
-			ret = new String[dataElements.length + 2]; // Integer elements plus
-																									// colorModel and url
-			ret[0] = urlStr;
-			for (int i = 1; i <= dataElements.length; i++) {
-				ret[i] = dataElements[i-1].toString();
-			}
-			ret[dataElements.length+1] = Utils.getColorModel(iplImage);
-		}*/
 		return ret;
 	}
 
@@ -326,84 +249,6 @@ UserRoleDB userroles = null;
 	}
 	
 
-	/*Element toDOMElement(Document domDoc, IplImage iplImage) {
-		
-		Element ret = domDoc.createElement("IplImage");
-		if(iplImage == null)
-			return ret;
-		
-		BytePointer bp = iplImage.imageData();
-		if(bp != null) {
-			Element el = domDoc.createElement("imageData");
-			try {
-		    el.appendChild(domDoc.createTextNode(bp.getString("UTF-8")));
-			} catch (UnsupportedEncodingException usee) {
-			}
-		}
-		bp = iplImage.imageDataOrigin();
-		if(bp != null) {
-			Element el = domDoc.createElement("imageDataOrigin");
-			try {
-		    el.appendChild(domDoc.createTextNode(bp.getString("UTF-8")));
-			} catch (UnsupportedEncodingException usee) {
-			}
-		}
-				Integer [] integerElements = getIntegerMembers(iplImage);
-				for(int i = 0; integerElements != null && i < integerElements.length; i++) {
-					Element el = domDoc.createElement(iplImageElementsInt[i]);
-					el.setAttribute("type", "int");
-					el.appendChild(domDoc.createTextNode(integerElements[i].toString()));
-					ret.appendChild(el);
-				}
-				String colorModel = Utils.getColorModel(iplImage);
-				if(colorModel.length() > 0) {
-					Element el = domDoc.createElement("colorModel");
-					el.setAttribute("type", "charArray");
-					el.appendChild(domDoc.createTextNode(colorModel));
-					ret.appendChild(el);
-				}
-		return ret;
-	}*/
-	/*
-	IplImage getIplImage(URL imageUrl) throws IOException {
-		File file = getTmpFile(imageUrl);
-		IplImage ret = getIplImage(file.getAbsolutePath());
-		file.delete();
-    // read an image  		
-		return ret;
-	}*/
-/*
-	Integer[] getIntegerMembers(IplImage iplImage) {
-		Integer[] ret = null;
-		if (iplImage != null) {
-			try {
-				ret = new Integer[iplImageElementsInt.length];
-				for (int i = 0; i < iplImageElementsInt.length; i++) {
-					Method m = iplImage.getClass().getMethod(iplImageElementsInt[i]);
-					try {
-						Object o = m.invoke(iplImage);
-						if (o instanceof Integer) {
-							ret[i] = (Integer) o;
-						}
-
-					} catch (IllegalArgumentException e) {
-						e.printStackTrace();
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
-					} catch (InvocationTargetException e) {
-						e.printStackTrace();
-					}
-				}
-			} catch (NoSuchMethodException nse) {
-
-			} catch (SecurityException se) {
-
-			}
-		}
-
-		return ret;
-	}
-	*/
 	File getTmpFile(URL url) throws IOException {
 		File ret = null;
 		String filename = url.getPath().replace('/', '_');
@@ -564,9 +409,7 @@ UserRoleDB userroles = null;
 		}
 
 	void exportGroundTruthData(String solrServer, String [] imageUrls, HttpServletRequest request,  HttpServletResponse resp, boolean isFinal) throws IOException {
-		//exportGroundTruthData(solrServer, pl.searchWithUrls(solrServer, imageUrls),resp, isFinal);
-		JsonObject js = null;
-		exportGroundTruthData(solrServer, js, request, resp, isFinal);
+		exportGroundTruthData(solrServer, pl.searchWithUrls(solrServer, imageUrls), request, resp, isFinal);
 	}
 	
 	void addUserEventFilter(PLSolrParams urlParameters, String user) {

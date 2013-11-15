@@ -59,7 +59,7 @@
     username="" 
     password="" 
     driverClassName="org.sqlite.JDBC"
-    url="jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/PLDB.db"/>
+    url="jdbc:sqlite:/C:/Users/akanduru/mohit_work/imagestat/war/PLDB.db"/>
 
 
     <!--<Resource 
@@ -79,7 +79,7 @@
 
      <Realm className="org.apache.catalina.realm.JDBCRealm"
    driverName="org.sqlite.JDBC"
-   connectionURL="jdbc:sqlite:/E:/gsoc/workspace/imagestats/war/UserDB.db"
+   connectionURL="jdbc:sqlite:/C:/Users/akanduru/mohit_work/imagestat/war/UserDB.db"
    connectionName=""
    connectionPassword=""
    userTable="users" userNameCol="username" userCredCol="password"
@@ -116,7 +116,7 @@
    <Environment name="defualtUsers" value="google-students"
          type="java.lang.String" />-->
 
-<Environment name="/repository/directory" value="E:/Photos"
+<Environment name="/repository/directory" value="C:/Users/akanduru/repo"
          type="java.lang.String" />
   
    <Environment name="/repository/virtual" value="repo"

@@ -47,14 +47,20 @@ public class DrawBoundingBoxHandler implements MouseDownHandler,
 	      	m.show();
 	      	return;
 	      }
-	      if(t.equals(ImageRegionModel.FACE)) {
+	      if(t.equals(ImageRegionModel.FACE) ||
+	    		  t.equals(ImageRegionModel.MOUTH)) {
 	      	bbox.setStrokeColor("yellow");
         }
-	      else if(t.equals(ImageRegionModel.PROFILE)) {
+	      else if(t.equals(ImageRegionModel.PROFILE) ||
+	    		  t.equals(ImageRegionModel.EYE)) {
 	      	bbox.setStrokeColor("red");
 	      }
-	      else if(t.equals(ImageRegionModel.SKIN)) {
-	      	bbox.setStrokeColor("cyan");
+	      else if(t.equals(ImageRegionModel.SKIN) ||
+	    		  t.equals(ImageRegionModel.NOSE)) {
+	      	bbox.setStrokeColor("green");
+	      }
+	      else if(t.equals(ImageRegionModel.EAR)) {
+	      	bbox.setStrokeColor("purple");
 	      }
 	      else {
 	      	return;

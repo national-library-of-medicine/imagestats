@@ -9,7 +9,7 @@ public class AnnotationBox extends Rectangle {
 
 	Line bottomEdge = new Line(0,0,0,0);
 	Line rightEdge = new Line(0,0,0,0);
-	String annType = ImageRegionModel.FACE;
+	String annType = ImageRegionModel.MOUTH;
 	public AnnotationBox(int x, int y, int width, int height, String anAnnType) {
 		super(x, y, width, height);
 		bottomEdge = new Line(x, y, x+width, y);

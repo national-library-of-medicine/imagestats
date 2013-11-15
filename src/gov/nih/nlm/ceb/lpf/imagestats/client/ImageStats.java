@@ -419,13 +419,13 @@ public class ImageStats implements IsWidget, EntryPoint {
 			Iterator<FacetModel> iter = facetStore.getAllChildren(it.next()).iterator();
 		while(iter.hasNext()){
 			FacetModel next = iter.next();
-			FacetModel parent = facetStore.getParent(next);
-			facetStore.remove(next);
+			//FacetModel parent = facetStore.getParent(next);
+			//facetStore.remove(next);
 			next.setCount(0);
-			facetStore.add(parent, next);
+			//facetStore.add(parent, next);
 		}
 		}
-		facetTree.expandAll();
+		//facetTree.expandAll();
 	}
 /*	PLSolrParams buildFacetFilters(List<FacetModel> selected) {
 		PLSolrParams ret = new PLSolrParams();
@@ -600,7 +600,7 @@ public class ImageStats implements IsWidget, EntryPoint {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						
+
 					}
 
 					@Override
